@@ -30,8 +30,8 @@
         "expo-font",
         {
           "fonts": [
-            "./assets/fonts/BricolageGrotesque.ttf",
-            "./assets/fonts/BricolageGrotesque-Light.ttf"
+            "./assets/fonts/Bold.ttf",
+            "./assets/fonts/Regular.ttf"
           ]
         }
       ]

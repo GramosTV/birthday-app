@@ -6,14 +6,13 @@ import { MainPage } from './components/MainPage/MainPage';
 import * as Font from 'expo-font';
 import { useEffect } from 'react';
 
-
 export default function App() {
-  const theme = useColorScheme() === 'dark'
+  const theme = useColorScheme() === 'dark';
 
   return (
-      <SafeAreaView style={{...styles.container, backgroundColor: theme ? '#000' : '#fff'}}>
+    <SafeAreaView style={{ ...styles.container, backgroundColor: theme ? '#000' : '#fff' }}>
       <MainPage />
-      </SafeAreaView>
+    </SafeAreaView>
   );
 }
 

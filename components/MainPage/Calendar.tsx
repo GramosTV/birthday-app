@@ -6,22 +6,22 @@ import moment from 'moment';
 export const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(moment());
   const today = moment();
-   const theme = useColorScheme() === 'dark'
-   const currentWeekdayIndex = today.day();
+  const theme = useColorScheme() === 'dark';
+  const currentWeekdayIndex = today.day();
   const renderHeader = () => {
-    return null
+    return null;
     // return (
-      // <View style={styles.header}>
-      //   <TouchableOpacity onPress={() => setCurrentDate(moment(currentDate).subtract(1, 'month'))}>
-      //     <Text style={styles.navButton}>Prev</Text>
-      //   </TouchableOpacity>
-      //   <Text style={styles.headerText}>
-      //     {currentDate.format('MMMM YYYY')}
-      //   </Text>
-      //   <TouchableOpacity onPress={() => setCurrentDate(moment(currentDate).add(1, 'month'))}>
-      //     <Text style={styles.navButton}>Next</Text>
-      //   </TouchableOpacity>
-      // </View>
+    // <View style={styles.header}>
+    //   <TouchableOpacity onPress={() => setCurrentDate(moment(currentDate).subtract(1, 'month'))}>
+    //     <Text style={styles.navButton}>Prev</Text>
+    //   </TouchableOpacity>
+    //   <Text style={styles.headerText}>
+    //     {currentDate.format('MMMM YYYY')}
+    //   </Text>
+    //   <TouchableOpacity onPress={() => setCurrentDate(moment(currentDate).add(1, 'month'))}>
+    //     <Text style={styles.navButton}>Next</Text>
+    //   </TouchableOpacity>
+    // </View>
     // );
   };
 
@@ -30,7 +30,21 @@ export const Calendar = () => {
     return (
       <View style={styles.daysOfWeek}>
         {daysOfWeek.map((day, index) => (
-          <Text key={index} style={{...styles.dayOfWeekText, color: theme ? index === currentWeekdayIndex ? '#fff' : '#FFFFFF80' : index === currentWeekdayIndex ? '#000' : '#555'}}>{day}</Text>
+          <Text
+            key={index}
+            style={{
+              ...styles.dayOfWeekText,
+              color: theme
+                ? index === currentWeekdayIndex
+                  ? '#fff'
+                  : '#FFFFFF80'
+                : index === currentWeekdayIndex
+                ? '#000'
+                : '#555',
+            }}
+          >
+            {day}
+          </Text>
         ))}
       </View>
     );
@@ -52,8 +66,21 @@ export const Calendar = () => {
       const dayStyle = today.isSame(moment(currentDate).date(day), 'day') ? styles.currentDay : styles.day;
       days.push(
         <View key={day} style={dayStyle}>
-          <Text style={dayStyle === styles.currentDay ? {color: '#fff',  backgroundColor: '#2b2b2b',
-    borderRadius: 20, paddingHorizontal: 20, paddingVertical: 8} : {color: theme ? '#FFFFFF80' : '#000'}}>{day}</Text>
+          <Text
+            style={
+              dayStyle === styles.currentDay
+                ? {
+                    color: '#fff',
+                    backgroundColor: '#2b2b2b',
+                    borderRadius: 20,
+                    paddingHorizontal: 20,
+                    paddingVertical: 8,
+                  }
+                : { color: theme ? '#FFFFFF80' : '#000' }
+            }
+          >
+            {day}
+          </Text>
         </View>
       );
     }
@@ -73,7 +100,7 @@ export const Calendar = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-   
+    marginBottom: 40,
   },
   header: {
     flexDirection: 'row',
@@ -100,7 +127,6 @@ const styles = StyleSheet.create({
     width: (Dimensions.get('window').width - 20) / 7,
     textAlign: 'center',
     fontWeight: 'bold',
-
   },
   days: {
     flexDirection: 'row',
@@ -108,7 +134,7 @@ const styles = StyleSheet.create({
   },
   day: {
     width: (Dimensions.get('window').width - 20) / 7,
-    height: 100,
+    height: 90,
     justifyContent: 'flex-start',
     alignItems: 'center',
     borderBottomWidth: 2,
@@ -117,7 +143,7 @@ const styles = StyleSheet.create({
   },
   currentDay: {
     width: (Dimensions.get('window').width - 20) / 7,
-    height: 100,
+    height: 90,
     justifyContent: 'flex-start',
     alignItems: 'center',
     borderBottomWidth: 2,
@@ -125,5 +151,3 @@ const styles = StyleSheet.create({
     paddingTop: 5,
   },
 });
-
-
