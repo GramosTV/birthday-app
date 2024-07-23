@@ -1,19 +1,26 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
+import { Calendar } from './components/MainPage/Calendar';
+import { useColorScheme } from 'react-native';
+import { MainPage } from './components/MainPage/MainPage';
+import * as Font from 'expo-font';
+import { useEffect } from 'react';
+
 
 export default function App() {
+  const theme = useColorScheme() === 'dark'
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+      <SafeAreaView style={{...styles.container, backgroundColor: theme ? '#000' : '#fff'}}>
+      <MainPage />
+      </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    paddingHorizontal: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
