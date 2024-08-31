@@ -1,14 +1,14 @@
-import { View, Text, ScrollView } from "react-native";
-import React from "react";
-import { Calendar } from "./Calendar";
-import { CurrentMonth } from "./CurrentMonth";
-import { Birthdays } from "./Birthdays";
-import { Buttons } from "./Buttons";
+import { View, Text, ScrollView } from 'react-native';
+import React from 'react';
+import { Calendar } from './Calendar';
+import { Nav } from '../Nav';
+import { Birthdays } from './Birthdays';
+import { Buttons } from './Buttons';
 
 export const MainPage = () => {
   return (
     <ScrollView>
-      <CurrentMonth />
+      <Nav />
       <Buttons />
       <Birthdays />
       <Calendar />
