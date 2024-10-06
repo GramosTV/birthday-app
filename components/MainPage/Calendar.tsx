@@ -1,27 +1,35 @@
-// components/Calendar.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, useColorScheme } from 'react-native';
 import moment from 'moment';
+import { getBirthdays } from '../../utils/AsyncStorage';
+import { Birthday } from '../../types';
+import { useIsFocused } from '@react-navigation/native';
 
 export const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(moment());
   const today = moment();
   const theme = useColorScheme() === 'dark';
   const currentWeekdayIndex = today.day();
+  const [birthdays, setBirthdays] = useState([]);
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    (async () => {
+      const data = await getBirthdays();
+      setBirthdays(data);
+    })();
+  }, [isFocused]);
   const renderHeader = () => {
     return null;
     // return (
-    // <View style={styles.header}>
-    //   <TouchableOpacity onPress={() => setCurrentDate(moment(currentDate).subtract(1, 'month'))}>
-    //     <Text style={styles.navButton}>Prev</Text>
-    //   </TouchableOpacity>
-    //   <Text style={styles.headerText}>
-    //     {currentDate.format('MMMM YYYY')}
-    //   </Text>
-    //   <TouchableOpacity onPress={() => setCurrentDate(moment(currentDate).add(1, 'month'))}>
-    //     <Text style={styles.navButton}>Next</Text>
-    //   </TouchableOpacity>
-    // </View>
+    //   <View style={styles.header}>
+    //     <TouchableOpacity onPress={() => setCurrentDate(moment(currentDate).subtract(1, 'month'))}>
+    //       <Text style={styles.navButton}>Prev</Text>
+    //     </TouchableOpacity>
+    //     <Text style={styles.headerText}>{currentDate.format('MMMM YYYY')}</Text>
+    //     <TouchableOpacity onPress={() => setCurrentDate(moment(currentDate).add(1, 'month'))}>
+    //       <Text style={styles.navButton}>Next</Text>
+    //     </TouchableOpacity>
+    //   </View>
     // );
   };
 
@@ -56,12 +64,10 @@ export const Calendar = () => {
     const days = [];
     const daysInMonth = endOfMonth.date();
 
-    // Add padding days before the first day of the month
     for (let i = 0; i < startOfMonth.day(); i++) {
       days.push(<View key={`pad-${i}`} style={styles.day} />);
     }
 
-    // Add actual days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const dayStyle = today.isSame(moment(currentDate).date(day), 'day') ? styles.currentDay : styles.day;
       days.push(
@@ -81,6 +87,21 @@ export const Calendar = () => {
           >
             {day}
           </Text>
+          <View style={{ marginBottom: 10 }}>
+            {birthdays.map((e: Birthday) => {
+              if (new Date(e.date).getDate() === day && new Date(e.date).getMonth() === currentDate.month()) {
+                return (
+                  <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 10, color: theme ? '#fff' : '#000', fontFamily: 'Regular' }}>
+                      {e.name}
+                    </Text>
+                    <View style={{ backgroundColor: e.color, width: 30, height: 2 }}></View>
+                  </View>
+                );
+              }
+              return null;
+            })}
+          </View>
         </View>
       );
     }
@@ -135,7 +156,7 @@ const styles = StyleSheet.create({
   day: {
     width: (Dimensions.get('window').width - 20) / 7,
     height: 90,
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomWidth: 2,
     borderColor: '#3d3d3d',
@@ -144,7 +165,7 @@ const styles = StyleSheet.create({
   currentDay: {
     width: (Dimensions.get('window').width - 20) / 7,
     height: 90,
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomWidth: 2,
     borderColor: '#3d3d3d',

@@ -1,9 +1,12 @@
 import { View, Text, useColorScheme, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { AntDesign } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { deleteAllBirthdays } from '../../utils/AsyncStorage';
 
 export const Buttons = () => {
   const theme = useColorScheme() === 'dark';
+  const navigation: any = useNavigation();
   return (
     <View
       style={{
@@ -44,6 +47,7 @@ export const Buttons = () => {
             paddingHorizontal: 20,
             marginLeft: 12,
           }}
+          onPress={() => deleteAllBirthdays()}
         >
           <Text style={{ fontSize: 14, color: theme ? '#fff' : '#000', fontFamily: 'Regular' }}>Events</Text>
         </TouchableOpacity>
@@ -58,6 +62,7 @@ export const Buttons = () => {
           borderWidth: 2,
           borderRadius: 53,
         }}
+        onPress={() => navigation.navigate('Create')}
       >
         <AntDesign name="plus" size={27} color={theme ? '#fff' : '#000'} />
       </TouchableOpacity>
