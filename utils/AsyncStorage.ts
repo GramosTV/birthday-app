@@ -32,8 +32,8 @@ export const saveBirthday = async (birthday: Birthday) => {
           to: newPath,
         });
         birthday.image = newPath;
-        const notificationId = await scheduleBirthdayNotification(birthday);
-        birthday.notificationId = notificationId;
+        // const notificationId = await scheduleBirthdayNotification(birthday);
+        // birthday.notificationId = notificationId;
         currentBirthdays.push(birthday);
       }
       currentBirthdays.sort((a, b) => {

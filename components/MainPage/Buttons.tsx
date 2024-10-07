@@ -47,7 +47,7 @@ export const Buttons = () => {
             paddingHorizontal: 20,
             marginLeft: 12,
           }}
-          onPress={() => deleteAllBirthdays()}
+          onPress={() => navigation.navigate('Browse')}
         >
           <Text style={{ fontSize: 14, color: theme ? '#fff' : '#000', fontFamily: 'Regular' }}>Events</Text>
         </TouchableOpacity>

@@ -66,3 +66,25 @@ export const getSecondsUntilDate = ({ day, month, hour, minute }: SecondsProps )
       console.error('Error scheduling birthday notifications:', error);
     }
   }
+
+  export const isBirthdayToday = (birthDate: Date) => {
+    const today = new Date();
+    const birthMonth = birthDate.getMonth();
+    const birthDay = birthDate.getDate();
+    const todayMonth = today.getMonth();
+    const todayDay = today.getDate();
+  
+    const isLeapYear = (year: number) => {
+      return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+    };
+  
+    if (birthMonth === 1 && birthDay === 29) {
+      if (isLeapYear(today.getFullYear())) {
+        return todayMonth === 1 && todayDay === 29;
+      } else {
+        return todayMonth === 1 && todayDay === 28;
+      }
+    }
+  
+    return birthMonth === todayMonth && birthDay === todayDay;
+  };

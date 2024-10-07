@@ -17,7 +17,7 @@ export const Nav = ({ topLeft, bottomLeft, topRight, bottomRight, num }: NavProp
         alignItems: 'center',
         flexDirection: 'row',
         paddingVertical: 40,
-        paddingTop: 15,
+        paddingTop: 10,
         paddingBottom: 20,
       }}
     >

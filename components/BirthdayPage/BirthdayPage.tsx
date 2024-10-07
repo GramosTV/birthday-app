@@ -7,10 +7,11 @@ import { getBirthdayById } from '../../utils/AsyncStorage';
 import { Birthday as bd } from '../../types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useIsFocused } from '@react-navigation/native';
-
+import { isBirthdayToday } from '../../utils/Misc';
+import ConfettiCannon from 'react-native-confetti-cannon';
 export const BirthdayPage = ({ route }: any) => {
   const { birthdayId } = route.params;
-  const [birthday, setBirthday] = useState<bd | undefined>(undefined);
+  const [birthday, setBirthday] = useState<bd>();
   const theme = useColorScheme() === 'dark';
   const isFocused = useIsFocused();
   useEffect(() => {
@@ -19,6 +20,21 @@ export const BirthdayPage = ({ route }: any) => {
       setBirthday(bd);
     })();
   }, [isFocused]);
+
+  if (!birthday)
+    return (
+      <SafeAreaView
+        style={{
+          flex: 1,
+          paddingHorizontal: 15,
+          alignItems: 'center',
+          justifyContent: 'center',
+          minWidth: '100%',
+          minHeight: '100%',
+          backgroundColor: theme ? '#000' : '#fff',
+        }}
+      ></SafeAreaView>
+    );
 
   const getDaysUntilBirthday = () => {
     if (!birthday) return null;
@@ -36,7 +52,7 @@ export const BirthdayPage = ({ route }: any) => {
   };
 
   const daysUntilBirthday = getDaysUntilBirthday();
-  const birthdayAge = birthday ? new Date().getFullYear() - new Date(birthday.date).getFullYear() : '?';
+  const birthdayAge = new Date().getFullYear() - new Date(birthday.date).getFullYear();
 
   return (
     <SafeAreaView
@@ -48,25 +64,25 @@ export const BirthdayPage = ({ route }: any) => {
         backgroundColor: theme ? '#000' : '#fff',
       }}
     >
+      {isBirthdayToday(new Date(birthday.date)) ? (
+        <ConfettiCannon count={350} origin={{ x: -10, y: 0 }} autoStartDelay={0} />
+      ) : null}
+
       <ScrollView style={{ width: '100%' }}>
         <Nav
           topLeft={
-            daysUntilBirthday !== null
-              ? daysUntilBirthday === 0
-                ? 'Today!'
-                : `${daysUntilBirthday} days until birthday`
-              : ''
+            isBirthdayToday(new Date(birthday.date))
+              ? `Happy Birthday ${birthday.name}!`
+              : `${daysUntilBirthday} days until birthday`
           }
-          bottomLeft={`${birthdayAge} Years Old`}
+          bottomLeft={
+            isBirthdayToday(new Date(birthday.date)) ? `Just turned ${birthdayAge}` : `Will turn ${birthdayAge}`
+          }
           topRight={'Budget'}
           bottomRight={'$' + String(birthday?.budget)}
         />
-        {birthday ? (
-          <>
-            <Birthday birthday={birthday} />
-            <QuickNote birthday={birthday} />
-          </>
-        ) : null}
+        <Birthday birthday={birthday} />
+        <QuickNote birthday={birthday} />
       </ScrollView>
     </SafeAreaView>
   );

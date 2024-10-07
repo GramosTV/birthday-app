@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, useColorScheme } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, useColorScheme, PanResponder } from 'react-native';
 import moment from 'moment';
 import { getBirthdays } from '../../utils/AsyncStorage';
 import { Birthday } from '../../types';
@@ -10,7 +10,7 @@ export const Calendar = () => {
   const today = moment();
   const theme = useColorScheme() === 'dark';
   const currentWeekdayIndex = today.day();
-  const [birthdays, setBirthdays] = useState([]);
+  const [birthdays, setBirthdays] = useState<Birthday[]>([]);
   const isFocused = useIsFocused();
   useEffect(() => {
     (async () => {
@@ -18,6 +18,7 @@ export const Calendar = () => {
       setBirthdays(data);
     })();
   }, [isFocused]);
+  console.log(today);
   const renderHeader = () => {
     return null;
     // return (
@@ -32,7 +33,49 @@ export const Calendar = () => {
     //   </View>
     // );
   };
+  const [swipeHandled, setSwipeHandled] = useState(false);
 
+  const swipeResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: (evt, gestureState) => {
+        // No action needed during the move; we will check the direction on release
+      },
+      onPanResponderRelease: (evt, gestureState) => {
+        const { dx } = gestureState;
+
+        if (!swipeHandled) {
+          if (dx > 50) {
+            handleSwipeRight();
+            setSwipeHandled(true);
+          } else if (dx < -50) {
+            handleSwipeLeft();
+            setSwipeHandled(true);
+          }
+        }
+      },
+      onPanResponderTerminate: () => {
+        setSwipeHandled(false);
+      },
+    })
+  ).current;
+  const handleSwipeLeft = () => {
+    setCurrentDate((prevDate) => {
+      const newDate = moment(prevDate).add(1, 'month');
+      return newDate.month() === 0 // If we go to January
+        ? moment(newDate).set({ month: 0 }) // Set to January
+        : moment(newDate).set({ year: new Date().getFullYear() }); // Set to current year
+    });
+  };
+
+  const handleSwipeRight = () => {
+    setCurrentDate((prevDate) => {
+      const newDate = moment(prevDate).subtract(1, 'month');
+      return newDate.month() === 11 // If we go to December
+        ? moment(newDate).set({ month: 11 }) // Set to December
+        : moment(newDate).set({ year: moment().year() });
+    });
+  };
   const renderDaysOfWeek = () => {
     const daysOfWeek = moment.weekdaysShort();
     return (
@@ -110,7 +153,7 @@ export const Calendar = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View {...swipeResponder.panHandlers} style={styles.container}>
       {renderHeader()}
       {renderDaysOfWeek()}
       {renderDays()}
