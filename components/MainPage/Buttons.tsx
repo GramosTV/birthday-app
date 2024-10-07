@@ -33,6 +33,7 @@ export const Buttons = () => {
             borderRadius: 53,
             paddingHorizontal: 20,
           }}
+          onPress={() => navigation.navigate('MainPage')}
         >
           <Text style={{ fontSize: 14, fontFamily: 'Regular', color: theme ? '#000' : '#fff' }}>Calendar</Text>
         </TouchableOpacity>

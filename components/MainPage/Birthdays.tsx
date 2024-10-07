@@ -4,8 +4,12 @@ import LinearGradient from 'react-native-linear-gradient';
 import { getBirthdays } from '../../utils/AsyncStorage';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { Birthday } from '../../types';
-
-export const Birthdays = () => {
+import moment from 'moment';
+import { MaterialIcons } from '@expo/vector-icons';
+interface BirthdayProps {
+  currentDate: moment.Moment;
+}
+export const Birthdays = ({ currentDate }: BirthdayProps) => {
   const theme = useColorScheme() === 'dark';
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
   const isFocused = useIsFocused();
@@ -19,20 +23,21 @@ export const Birthdays = () => {
 
   // Separate upcoming and past birthdays
   const upcomingBirthdays = birthdays.filter((item) => {
-    const birthdayDate = new Date(item.date);
-    return birthdayDate.getMonth() === new Date().getMonth() && birthdayDate.getDate() >= new Date().getDate();
+    const birthdayDate = moment(item.date); // Use moment for birthday date
+    return birthdayDate.month() === currentDate.month() && birthdayDate.date() >= currentDate.date();
   });
 
   const pastBirthdays = birthdays.filter((item) => {
-    const birthdayDate = new Date(item.date);
-    return birthdayDate.getMonth() === new Date().getMonth() && birthdayDate.getDate() < new Date().getDate();
+    const birthdayDate = moment(item.date); // Use moment for birthday date
+    return birthdayDate.month() === currentDate.month() && birthdayDate.date() < currentDate.date();
   });
 
   // Combine both arrays
   const sortedBirthdays = [...upcomingBirthdays, ...pastBirthdays];
   const navigation: any = useNavigation();
+
   const renderItem = ({ item }: any) => {
-    const isPast = new Date(item.date).getDate() < new Date().getDate();
+    const isPast = moment(item.date).date() < currentDate.date();
     const opacityStyle = isPast ? { opacity: 0.5 } : { opacity: 1 };
 
     return (
@@ -72,7 +77,7 @@ export const Birthdays = () => {
             width: 35,
           }}
         >
-          <Text style={{ color: theme ? '#fff' : '#000', fontFamily: 'Bold' }}>{new Date(item.date).getDate()}</Text>
+          <Text style={{ color: theme ? '#fff' : '#000', fontFamily: 'Bold' }}>{moment(item.date).date()}</Text>
         </View>
         <Text
           style={{ color: theme ? '#fff' : '#000', fontFamily: 'Bold', fontSize: 18, marginTop: 15, ...opacityStyle }}
@@ -82,7 +87,36 @@ export const Birthdays = () => {
       </TouchableOpacity>
     );
   };
-
+  if (!sortedBirthdays.length)
+    return (
+      <View style={{ paddingVertical: 42, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{ justifyContent: 'center', alignItems: 'center', position: 'relative', marginRight: 10 }}>
+          <MaterialIcons name="cake" size={75} color="gray" />
+          <MaterialIcons
+            name="cancel"
+            size={50}
+            color={theme ? 'white' : 'black'}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: [
+                { translateX: -25 }, // Move left by half of its width (60 / 2)
+                { translateY: -25 }, // Move up by half of its height (60 / 2)
+              ],
+            }}
+          />
+        </View>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ color: theme ? '#fff' : '#000', fontFamily: 'Bold', fontSize: 18 }}>
+            No birthdays this month?
+          </Text>
+          <Text style={{ color: theme ? '#fff' : '#000', fontSize: 18, fontFamily: 'Regular' }}>
+            Go add some right now
+          </Text>
+        </View>
+      </View>
+    );
   return (
     <View style={{ position: 'relative' }}>
       <LinearGradient

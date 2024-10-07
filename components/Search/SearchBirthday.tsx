@@ -54,68 +54,14 @@ const getBirthdayNumber = (birthDate: Date) => {
   return `They will turn ${birthdayNumber + 1} on`;
 };
 interface BrowseBirthdayProps {
-  currentDate: moment.Moment;
-  setCurrentDate: React.Dispatch<React.SetStateAction<moment.Moment>>;
+  filteredBirthdays: Birthday[];
 }
-export const BrowseBirthday = ({ currentDate, setCurrentDate }: BrowseBirthdayProps) => {
+export const SearchBirthday = ({ filteredBirthdays }: BrowseBirthdayProps) => {
   const theme = useColorScheme() === 'dark';
-  const [birthdays, setBirthdays] = useState<Birthday[]>([]);
   const isFocused = useIsFocused();
   const navigation: any = useNavigation();
   const [swipeHandled, setSwipeHandled] = useState(false);
-  useEffect(() => {
-    (async () => {
-      const data = await getBirthdays();
-      const currentMonth = currentDate.month(); // Use currentDate from props
-      const currentDay = currentDate.date(); // Get the current day from currentDate
 
-      const upcomingBirthdays = data.filter((bd: Birthday) => {
-        const birthdayDate = moment(bd.date); // Use moment to parse birthday date
-        return birthdayDate.month() === currentMonth && birthdayDate.date() >= currentDay;
-      });
-
-      setBirthdays(upcomingBirthdays);
-    })();
-  }, [isFocused, currentDate]);
-  const swipeResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onPanResponderMove: (evt, gestureState) => {
-        // No action needed during the move; we will check the direction on release
-      },
-      onPanResponderRelease: (evt, gestureState) => {
-        const { dx } = gestureState;
-
-        if (!swipeHandled) {
-          if (dx > 50) {
-            handleSwipeRight();
-            setSwipeHandled(true);
-          } else if (dx < -50) {
-            handleSwipeLeft();
-            setSwipeHandled(true);
-          }
-        }
-      },
-      onPanResponderTerminate: () => {
-        setSwipeHandled(false);
-      },
-    })
-  ).current;
-  const handleSwipeLeft = () => {
-    setCurrentDate((prevDate) => {
-      const newDate = moment(prevDate).add(1, 'month');
-      newDate.set({ year: new Date().getFullYear() });
-      return newDate;
-    });
-  };
-
-  const handleSwipeRight = () => {
-    setCurrentDate((prevDate) => {
-      const newDate = moment(prevDate).subtract(1, 'month');
-      newDate.set({ year: new Date().getFullYear() });
-      return newDate;
-    });
-  };
   const renderItem = ({ item, index }: { item: any; index: number }) => {
     return (
       <TouchableOpacity
@@ -156,47 +102,16 @@ export const BrowseBirthday = ({ currentDate, setCurrentDate }: BrowseBirthdayPr
       </TouchableOpacity>
     );
   };
-  if (!birthdays.length) {
-    return (
-      <View
-        {...swipeResponder.panHandlers}
-        style={{ paddingTop: 100, minHeight: Dimensions.get('window').height - 100 }}
-      >
-        <View style={{ justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
-          <MaterialIcons name="cake" size={150} color="gray" />
-          <MaterialIcons
-            name="cancel"
-            size={100}
-            color={theme ? 'white' : 'black'}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: [
-                { translateX: -50 }, // Move left by half of its width (60 / 2)
-                { translateY: -50 }, // Move up by half of its height (60 / 2)
-              ],
-            }}
-          />
-        </View>
-        <Text style={{ color: theme ? '#fff' : '#222', fontSize: 24, fontFamily: 'Bold', textAlign: 'center' }}>
-          No Birthdays?
-        </Text>
-        <Text style={{ color: theme ? '#fff' : '#222', fontSize: 22, fontFamily: 'Regular', textAlign: 'center' }}>
-          Go add some right now
-        </Text>
-      </View>
-    );
-  }
+
   return (
-    <View {...swipeResponder.panHandlers} style={{ minHeight: '100%' }}>
+    <View style={{ minHeight: '100%' }}>
       <FlatList
         style={{
           zIndex: -1,
           flexGrow: 1,
           paddingVertical: 40,
         }}
-        data={birthdays}
+        data={filteredBirthdays}
         numColumns={1}
         keyExtractor={(item, index) => index.toString()}
         renderItem={renderItem}

@@ -4,9 +4,11 @@ import moment from 'moment';
 import { getBirthdays } from '../../utils/AsyncStorage';
 import { Birthday } from '../../types';
 import { useIsFocused } from '@react-navigation/native';
-
-export const Calendar = () => {
-  const [currentDate, setCurrentDate] = useState(moment());
+interface CalendarProps {
+  currentDate: moment.Moment;
+  setCurrentDate: React.Dispatch<React.SetStateAction<moment.Moment>>;
+}
+export const Calendar = ({ currentDate, setCurrentDate }: CalendarProps) => {
   const today = moment();
   const theme = useColorScheme() === 'dark';
   const currentWeekdayIndex = today.day();
@@ -59,21 +61,20 @@ export const Calendar = () => {
       },
     })
   ).current;
+
   const handleSwipeLeft = () => {
     setCurrentDate((prevDate) => {
       const newDate = moment(prevDate).add(1, 'month');
-      return newDate.month() === 0 // If we go to January
-        ? moment(newDate).set({ month: 0 }) // Set to January
-        : moment(newDate).set({ year: new Date().getFullYear() }); // Set to current year
+      newDate.set({ year: new Date().getFullYear() });
+      return newDate;
     });
   };
 
   const handleSwipeRight = () => {
     setCurrentDate((prevDate) => {
       const newDate = moment(prevDate).subtract(1, 'month');
-      return newDate.month() === 11 // If we go to December
-        ? moment(newDate).set({ month: 11 }) // Set to December
-        : moment(newDate).set({ year: moment().year() });
+      newDate.set({ year: new Date().getFullYear() });
+      return newDate;
     });
   };
   const renderDaysOfWeek = () => {
