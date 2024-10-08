@@ -27,7 +27,7 @@ export const Browse = () => {
       style={{
         width: '100%',
         minHeight: '100%',
-        paddingHorizontal: 10,
+        paddingHorizontal: 15,
         backgroundColor: theme ? '#000' : '#fff',
       }}
     >

@@ -10,19 +10,19 @@ interface SecondsProps {
     hour: number;
     minute: number;
 }
-export const getSecondsUntilDate = ({ day, month, hour, minute }: SecondsProps ) => {
-    const now = new Date();
-    let date = new Date(now.getFullYear(), month - 1, day, hour, minute, 0);
-    let diff = date.getTime() - now.getTime();
-    //console.log("seconds untill", diff / 1000);
-    if (diff > 0) {
-      return Math.floor(diff / 1000);
-    } else {
-      date = new Date(now.getFullYear() + 1, month, day, hour, minute);
-      diff = date.getTime() - now.getTime();
-      return Math.floor(diff / 1000);
-    }
-  };
+export const getSecondsUntilDate = ({day, month, hour, minute}: SecondsProps) => {
+  const now = new Date();
+  let date = new Date(now.getFullYear(), month - 1, day, hour, minute, 0);
+  let diff = date.getTime() - now.getTime();
+
+  if (diff > 0) {
+    return Math.floor(diff / 1000);
+  } else {
+    date = new Date(now.getFullYear() + 1, month - 1, day, hour, minute, 0);
+    diff = date.getTime() - now.getTime();
+    return Math.floor(diff / 1000);
+  }
+};
 
   export const notifCheck = async () => {
     try {
@@ -59,6 +59,7 @@ export const getSecondsUntilDate = ({ day, month, hour, minute }: SecondsProps )
             repeats: false,
           },
         });
+
         birthday.notificationId = notificationId;
         await saveBirthday(birthday);
       }

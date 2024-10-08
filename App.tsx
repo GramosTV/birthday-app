@@ -40,7 +40,6 @@ Notifications.setNotificationHandler({
   }),
 });
 TaskManager.defineTask('BIRTHDAY_NOTIFICATION_TASK', notifCheck);
-
 const SCHEDULED_KEY = 'isBirthdayNotificationScheduled';
 const scheduleBirthdayNotificationTask = async () => {
   const isScheduled = await AsyncStorage.getItem(SCHEDULED_KEY);
@@ -83,13 +82,13 @@ export default function App() {
       Animated.parallel([
         Animated.timing(inputWidth, {
           toValue: 0,
-          duration: 250,
+          duration: 230,
           useNativeDriver: false,
           easing: Easing.linear,
         }),
         Animated.timing(inputPadding, {
           toValue: 0, // Reduce padding to 0
-          duration: 250,
+          duration: 230,
           useNativeDriver: false,
           easing: Easing.linear,
         }),
@@ -101,13 +100,13 @@ export default function App() {
       Animated.parallel([
         Animated.timing(inputWidth, {
           toValue: 250, // Target width
-          duration: 250,
+          duration: 230,
           useNativeDriver: false,
           easing: Easing.linear,
         }),
         Animated.timing(inputPadding, {
           toValue: 10, // Target paddingHorizontal
-          duration: 250,
+          duration: 230,
           useNativeDriver: false,
           easing: Easing.linear,
         }),
@@ -141,7 +140,7 @@ export default function App() {
           options={{
             headerShown: false,
             presentation: 'modal',
-            animation: 'slide_from_bottom',
+            animation: 'fade_from_bottom',
             animationDuration: 200,
           }}
           initialParams={{ filteredBirthdays, inputText, allBirthdays }}

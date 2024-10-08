@@ -17,8 +17,9 @@ export const Nav = ({ topLeft, bottomLeft, topRight, bottomRight, num }: NavProp
         alignItems: 'center',
         flexDirection: 'row',
         paddingVertical: 40,
-        paddingTop: 5,
+        paddingTop: 20,
         paddingBottom: 10,
+        width: '100%',
       }}
     >
       <View style={{ justifyContent: 'center', alignItems: 'flex-start' }}>

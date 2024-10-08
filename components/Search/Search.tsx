@@ -19,7 +19,7 @@ export const Search = () => {
       style={{
         width: '100%',
         height: '100%',
-        paddingHorizontal: 10,
+        paddingHorizontal: 15,
         backgroundColor: theme ? '#000' : '#fff',
         position: 'relative',
       }}

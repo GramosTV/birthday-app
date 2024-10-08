@@ -89,7 +89,15 @@ export const Birthdays = ({ currentDate }: BirthdayProps) => {
   };
   if (!sortedBirthdays.length)
     return (
-      <View style={{ paddingVertical: 42, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+      <View
+        style={{
+          paddingVertical: 42,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%',
+        }}
+      >
         <View style={{ justifyContent: 'center', alignItems: 'center', position: 'relative', marginRight: 10 }}>
           <MaterialIcons name="cake" size={75} color="gray" />
           <MaterialIcons
@@ -118,7 +126,7 @@ export const Birthdays = ({ currentDate }: BirthdayProps) => {
       </View>
     );
   return (
-    <View style={{ position: 'relative' }}>
+    <View style={{ position: 'relative', minWidth: '100%' }}>
       <LinearGradient
         colors={['transparent', theme ? '#000' : '#fff']}
         start={{ x: 0, y: 0 }}

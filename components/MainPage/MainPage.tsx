@@ -49,31 +49,26 @@ export const MainPage = () => {
     <SafeAreaView
       style={{
         flex: 1,
-        paddingHorizontal: 10,
+        paddingHorizontal: 15,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: theme ? '#000' : '#fff',
         position: 'relative',
       }}
     >
-      <ScrollView>
-        <Nav
-          topLeft={'Upcoming'}
-          bottomLeft={currentDate.format('MMMM')}
-          topRight={'Budget'}
-          bottomRight={countBudgetInCurrentMonth(birthdays)}
-          num={countBirthdaysInCurrentMonth(birthdays)}
-        />
-        <Buttons />
-        <Birthdays currentDate={currentDate} />
-        <Calendar currentDate={currentDate} setCurrentDate={setCurrentDate} />
-      </ScrollView>
-      <TouchableOpacity
-        style={{ position: 'absolute', bottom: 25, padding: 16, borderRadius: 20, backgroundColor: '#232323' }}
-        onPress={() => navigation.navigate('Search')}
-      >
-        <MaterialIcons name="search" size={34} color={'white'} />
-      </TouchableOpacity>
+      {/* <ScrollView> */}
+      <Nav
+        topLeft={'Upcoming'}
+        bottomLeft={currentDate.format('MMMM')}
+        topRight={'Budget'}
+        bottomRight={countBudgetInCurrentMonth(birthdays)}
+        num={countBirthdaysInCurrentMonth(birthdays)}
+      />
+      <Buttons />
+      <Birthdays currentDate={currentDate} />
+      <Calendar currentDate={currentDate} setCurrentDate={setCurrentDate} />
+
+      {/* </ScrollView> */}
     </SafeAreaView>
   );
 };

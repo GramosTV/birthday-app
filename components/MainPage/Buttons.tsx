@@ -13,6 +13,7 @@ export const Buttons = () => {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        width: '100%',
       }}
     >
       <View
