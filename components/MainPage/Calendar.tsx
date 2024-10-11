@@ -123,7 +123,7 @@ export const Calendar = ({ currentDate, setCurrentDate }: CalendarProps) => {
                     color: '#fff',
                     backgroundColor: '#2b2b2b',
                     borderRadius: 20,
-                    paddingHorizontal: 20,
+                    paddingHorizontal: 15,
                     paddingVertical: 8,
                   }
                 : { color: theme ? '#FFFFFF80' : '#000' }
