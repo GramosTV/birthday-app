@@ -33,7 +33,7 @@ export const Birthdays = ({ currentDate }: BirthdayProps) => {
   });
 
   // Combine both arrays
-  const sortedBirthdays = [...upcomingBirthdays, ...pastBirthdays];
+  const sortedBirthdays = [...upcomingBirthdays, ...pastBirthdays.reverse()];
   const navigation: any = useNavigation();
 
   const renderItem = ({ item }: any) => {
