@@ -71,8 +71,10 @@ const scheduleBirthdayNotificationTask = async () => {
 export default function App() {
   const theme = useColorScheme() === 'dark';
   useEffect(() => {
-    setupNotificationChannel();
-    scheduleBirthdayNotificationTask();
+    (async () => {
+      await setupNotificationChannel();
+      await scheduleBirthdayNotificationTask();
+    })();
   }, []);
   const [allBirthdays, setAllBirthdays] = useState<Birthday[]>([]);
 
