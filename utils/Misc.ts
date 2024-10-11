@@ -56,6 +56,7 @@ export const getSecondsUntilDate = ({day, month, hour, minute}: SecondsProps) =>
               hour: 9,
               minute: 0,
             }),
+            channelId: 'birthday-reminders',
             repeats: false,
           },
         });
