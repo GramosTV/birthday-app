@@ -3,6 +3,7 @@ import {
   Animated,
   Dimensions,
   Easing,
+  Platform,
   SafeAreaView,
   StyleSheet,
   TextInput,
@@ -39,6 +40,21 @@ Notifications.setNotificationHandler({
     shouldSetBadge: true,
   }),
 });
+const setupNotificationChannel = async () => {
+  if (Platform.OS === 'android') {
+    const channelSet = await AsyncStorage.getItem('notificationChannelSet');
+    if (channelSet !== 'true') {
+      await Notifications.setNotificationChannelAsync('birthday-reminders', {
+        name: 'Birthday Reminders',
+        importance: Notifications.AndroidImportance.HIGH,
+        sound: 'default', // Can be customized
+        vibrationPattern: [0, 250, 250, 250], // Optional vibration pattern
+        // lightColor: '#FF231F7C', // Optional LED light color
+      });
+      await AsyncStorage.setItem('notificationChannelSet', 'true');
+    }
+  }
+};
 TaskManager.defineTask('BIRTHDAY_NOTIFICATION_TASK', notifCheck);
 const SCHEDULED_KEY = 'isBirthdayNotificationScheduled';
 const scheduleBirthdayNotificationTask = async () => {
@@ -55,6 +71,7 @@ const scheduleBirthdayNotificationTask = async () => {
 export default function App() {
   const theme = useColorScheme() === 'dark';
   useEffect(() => {
+    setupNotificationChannel();
     scheduleBirthdayNotificationTask();
   }, []);
   const [allBirthdays, setAllBirthdays] = useState<Birthday[]>([]);
