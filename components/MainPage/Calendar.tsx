@@ -135,7 +135,7 @@ export const Calendar = ({ currentDate, setCurrentDate }: CalendarProps) => {
             {birthdays.map((e: Birthday) => {
               if (new Date(e.date).getDate() === day && new Date(e.date).getMonth() === currentDate.month()) {
                 return (
-                  <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                  <View style={{ justifyContent: 'center', alignItems: 'center' }} key={e.id}>
                     <Text style={{ fontSize: 10, color: theme ? '#fff' : '#000', fontFamily: 'Regular' }}>
                       {e.name}
                     </Text>

@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import { Calendar } from './components/MainPage/Calendar';
-import { useColorScheme } from 'react-native';
+import { useColorScheme, Text } from 'react-native';
 import { MainPage } from './components/MainPage/MainPage';
 import * as Font from 'expo-font';
 import { useEffect, useRef, useState } from 'react';
@@ -24,9 +24,9 @@ import * as Notifications from 'expo-notifications';
 import { Edit } from './components/Edit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as BackgroundFetch from 'expo-background-fetch';
-import { getBirthdays, saveBirthday } from './utils/AsyncStorage';
+import { deleteAllBirthdays, getBirthdays, saveBirthday } from './utils/AsyncStorage';
 import * as TaskManager from 'expo-task-manager';
-import { getSecondsUntilDate, notifCheck } from './utils/Misc';
+import { exportBirthdays, getSecondsUntilDate, notifCheck } from './utils/Misc';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Search } from './components/Search/Search';
 import { Birthday } from './types';
@@ -42,19 +42,21 @@ Notifications.setNotificationHandler({
 });
 const setupNotificationChannel = async () => {
   if (Platform.OS === 'android') {
-    const channelSet = await AsyncStorage.getItem('notificationChannelSet');
-    if (channelSet !== 'true') {
-      await Notifications.setNotificationChannelAsync('birthday-reminders', {
-        name: 'Birthday Reminders',
-        importance: Notifications.AndroidImportance.HIGH,
-        sound: 'default', // Can be customized
-        vibrationPattern: [0, 250, 250, 250], // Optional vibration pattern
-        // lightColor: '#FF231F7C', // Optional LED light color
-      });
-      await AsyncStorage.setItem('notificationChannelSet', 'true');
-    }
+    // const channelSet = await AsyncStorage.getItem('notificationChannelSet');
+    // if (channelSet !== 'true') {
+    console.log('set channel');
+    await Notifications.setNotificationChannelAsync('birthday-reminders', {
+      name: 'Birthday Reminders',
+      importance: Notifications.AndroidImportance.HIGH,
+      sound: 'default', // Can be customized
+      vibrationPattern: [0, 250, 250, 250], // Optional vibration pattern
+      // lightColor: '#FF231F7C', // Optional LED light color
+    });
+    await AsyncStorage.setItem('notificationChannelSet', 'true');
   }
+  // }
 };
+
 TaskManager.defineTask('BIRTHDAY_NOTIFICATION_TASK', notifCheck);
 const SCHEDULED_KEY = 'isBirthdayNotificationScheduled';
 const scheduleBirthdayNotificationTask = async () => {
@@ -72,6 +74,10 @@ export default function App() {
   const theme = useColorScheme() === 'dark';
   useEffect(() => {
     (async () => {
+      const { status } = await Notifications.getPermissionsAsync();
+      if (status !== 'granted') {
+        await Notifications.requestPermissionsAsync();
+      }
       await setupNotificationChannel();
       await scheduleBirthdayNotificationTask();
     })();
@@ -141,8 +147,78 @@ export default function App() {
     );
     setFilteredBirthdays(filtered);
   };
+  const formatDate = (seconds: number) => {
+    const date = new Date(Date.now() + seconds * 1000);
+    const day = String(date.getDate()).padStart(2, '0'); // Add leading zero if needed
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const logActiveChannelsAndPendingNotifications = async () => {
+    // await Notifications.cancelAllScheduledNotificationsAsync();
+    if (Platform.OS === 'android') {
+      // Log active notification channels
+      const channels = await Notifications.getNotificationChannelsAsync();
+      console.log('Active Notification Channels:', channels);
+    } else {
+      console.log('Notification channels are only available on Android.');
+    }
+
+    // Log all pending (scheduled) notifications
+    const pendingNotifications = await Notifications.getAllScheduledNotificationsAsync();
+    console.log('Pending Notifications:', pendingNotifications.length);
+
+    // Format and log notifications
+    pendingNotifications.forEach((notification) => {
+      const id = notification.identifier; // Get the notification ID
+      const title: any = notification.content.title;
+      const name = title.replace('🎉 Happy Birthday, ', '').replace('!', '').trim(); // Extract the name
+      const seconds = (notification.trigger as any).seconds; // Get the seconds for the trigger
+      const dateOfNotif = formatDate(seconds); // Format the date
+    
+      console.log(`ID: ${id}, Name: ${name}, Date: ${dateOfNotif}`);
+    });
+  };
+
+  const simulateBirthdayNotification = async (birthday: any) => {
+    return await Notifications.scheduleNotificationAsync({
+      content: {
+        title: `🎉 Happy Birthday, ${birthday.name}!`,
+        body: `Don't forget to wish ${birthday.name} ${birthday.surname} a happy birthday!`,
+        data: { birthdayId: birthday.id },
+      },
+      trigger: { seconds: 5 }, // Triggers notification in 5 seconds
+    });
+  };
+  const unregisterTasks = async () => {
+    await TaskManager.unregisterAllTasksAsync()
+  }
   return (
     <NavigationContainer>
+      {/* <TouchableOpacity onPress={logActiveChannelsAndPendingNotifications}>
+        <Text>Log</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={deleteAllBirthdays}>
+        <Text>Delete all</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => simulateBirthdayNotification({
+    name: "John",
+    surname: "Doe",
+    id: "12345",
+    date: "2024-11-09"
+  })}>
+    <Text>Test notif</Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={notifCheck}>
+    <Text>Notif check</Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={unregisterTasks}>
+      <Text>Unregister tasks</Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={() => exportBirthdays(false)}>
+    <Text>Export</Text>
+    </TouchableOpacity> */}
       <Stack.Navigator initialRouteName="MainPage">
         <Stack.Screen name="MainPage" component={MainPage} options={{ headerShown: false }} />
         <Stack.Screen name="BirthdayPage" component={BirthdayPage} options={{ headerShown: false }} />
