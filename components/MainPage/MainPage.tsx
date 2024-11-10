@@ -11,6 +11,7 @@ import { getCurrentMonth } from '../../utils/Misc';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import moment from 'moment';
 import { MaterialIcons } from '@expo/vector-icons';
+import { StatusBar } from 'expo-status-bar';
 
 export const MainPage = () => {
   const theme = useColorScheme() === 'dark';
@@ -56,6 +57,7 @@ export const MainPage = () => {
         position: 'relative',
       }}
     >
+     
       {/* <ScrollView> */}
       <Nav
         topLeft={'Upcoming'}

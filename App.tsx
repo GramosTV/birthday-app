@@ -196,6 +196,7 @@ export default function App() {
   }
   return (
     <NavigationContainer>
+       <StatusBar style={theme ? 'dark' : 'light'}/>
       {/* <TouchableOpacity onPress={logActiveChannelsAndPendingNotifications}>
         <Text>Log</Text>
       </TouchableOpacity>
@@ -220,6 +221,7 @@ export default function App() {
     <Text>Export</Text>
     </TouchableOpacity> */}
       <Stack.Navigator initialRouteName="MainPage">
+        
         <Stack.Screen name="MainPage" component={MainPage} options={{ headerShown: false }} />
         <Stack.Screen name="BirthdayPage" component={BirthdayPage} options={{ headerShown: false }} />
         <Stack.Screen
@@ -266,6 +268,7 @@ export default function App() {
             flexDirection: 'row',
             backgroundColor: theme ? '#333' : '#f0f0f0',
             borderRadius: 20,
+            opacity: 0.6,
           }}
         >
           <TouchableOpacity

@@ -1,48 +1,41 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, useColorScheme, PanResponder } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, useColorScheme, PanResponder, Animated } from 'react-native';
 import moment from 'moment';
 import { getBirthdays } from '../../utils/AsyncStorage';
 import { Birthday } from '../../types';
 import { useIsFocused } from '@react-navigation/native';
+
 interface CalendarProps {
   currentDate: moment.Moment;
   setCurrentDate: React.Dispatch<React.SetStateAction<moment.Moment>>;
 }
+
 export const Calendar = ({ currentDate, setCurrentDate }: CalendarProps) => {
   const today = moment();
   const theme = useColorScheme() === 'dark';
   const currentWeekdayIndex = today.day();
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
   const isFocused = useIsFocused();
+  
+  const fadeAnim = useRef(new Animated.Value(1)).current;  // Fade animation value
+
   useEffect(() => {
     (async () => {
       const data = await getBirthdays();
       setBirthdays(data);
     })();
   }, [isFocused]);
-  console.log(today);
+
   const renderHeader = () => {
     return null;
-    // return (
-    //   <View style={styles.header}>
-    //     <TouchableOpacity onPress={() => setCurrentDate(moment(currentDate).subtract(1, 'month'))}>
-    //       <Text style={styles.navButton}>Prev</Text>
-    //     </TouchableOpacity>
-    //     <Text style={styles.headerText}>{currentDate.format('MMMM YYYY')}</Text>
-    //     <TouchableOpacity onPress={() => setCurrentDate(moment(currentDate).add(1, 'month'))}>
-    //       <Text style={styles.navButton}>Next</Text>
-    //     </TouchableOpacity>
-    //   </View>
-    // );
   };
+
   const [swipeHandled, setSwipeHandled] = useState(false);
 
   const swipeResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
-      onPanResponderMove: (evt, gestureState) => {
-        // No action needed during the move; we will check the direction on release
-      },
+      onPanResponderMove: (evt, gestureState) => {},
       onPanResponderRelease: (evt, gestureState) => {
         const { dx } = gestureState;
 
@@ -63,20 +56,43 @@ export const Calendar = ({ currentDate, setCurrentDate }: CalendarProps) => {
   ).current;
 
   const handleSwipeLeft = () => {
-    setCurrentDate((prevDate) => {
-      const newDate = moment(prevDate).add(1, 'month');
-      newDate.set({ year: new Date().getFullYear() });
-      return newDate;
+    fadeOut(() => {
+      setCurrentDate((prevDate) => {
+        const newDate = moment(prevDate).add(1, 'month');
+        newDate.set({ year: new Date().getFullYear() });
+        fadeIn();
+        return newDate;
+      });
     });
   };
 
   const handleSwipeRight = () => {
-    setCurrentDate((prevDate) => {
-      const newDate = moment(prevDate).subtract(1, 'month');
-      newDate.set({ year: new Date().getFullYear() });
-      return newDate;
+    fadeOut(() => {
+      setCurrentDate((prevDate) => {
+        const newDate = moment(prevDate).subtract(1, 'month');
+        newDate.set({ year: new Date().getFullYear() });
+        fadeIn();
+        return newDate;
+      });
     });
   };
+
+  const fadeOut = (callback: () => void) => {
+    Animated.timing(fadeAnim, {
+      toValue: 0,  // Fade out
+      duration: 80,
+      useNativeDriver: true,
+    }).start(() => callback());
+  };
+
+  const fadeIn = () => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,  // Fade in
+      duration: 80,
+      useNativeDriver: true,
+    }).start();
+  };
+
   const renderDaysOfWeek = () => {
     const daysOfWeek = moment.weekdaysShort();
     return (
@@ -154,11 +170,11 @@ export const Calendar = ({ currentDate, setCurrentDate }: CalendarProps) => {
   };
 
   return (
-    <View {...swipeResponder.panHandlers} style={styles.container}>
+    <Animated.View {...swipeResponder.panHandlers} style={[styles.container, { opacity: fadeAnim }]}>
       {renderHeader()}
       {renderDaysOfWeek()}
       {renderDays()}
-    </View>
+    </Animated.View>
   );
 };
 
@@ -166,20 +182,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginBottom: 40,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  navButton: {
-    fontSize: 18,
-    color: '#007AFF',
-  },
-  headerText: {
-    fontSize: 18,
-    fontWeight: 'bold',
   },
   daysOfWeek: {
     flexDirection: 'row',
@@ -199,7 +201,7 @@ const styles = StyleSheet.create({
   },
   day: {
     width: (Dimensions.get('window').width - 20) / 7,
-    height: 90,
+    height: 85,
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomWidth: 2,
@@ -208,7 +210,7 @@ const styles = StyleSheet.create({
   },
   currentDay: {
     width: (Dimensions.get('window').width - 20) / 7,
-    height: 90,
+    height: 85,
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomWidth: 2,

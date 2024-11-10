@@ -1,9 +1,10 @@
-import { View, useColorScheme } from 'react-native';
+import { SafeAreaView, View, useColorScheme } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Nav } from '../Nav';
 import { Buttons } from '../MainPage/Buttons';
 import { BrowseBirthday } from './BrowseBirthday';
 import moment from 'moment';
+import { StatusBar } from 'expo-status-bar';
 
 export const Browse = () => {
   const theme = useColorScheme() === 'dark';
@@ -23,7 +24,7 @@ export const Browse = () => {
   }, []);
 
   return (
-    <View
+    <SafeAreaView
       style={{
         width: '100%',
         minHeight: '100%',
@@ -31,6 +32,7 @@ export const Browse = () => {
         backgroundColor: theme ? '#000' : '#fff',
       }}
     >
+      
       <Nav
         topLeft={'Upcoming'}
         bottomLeft={currentDate.format('MMMM')} // Get current month name
@@ -39,6 +41,6 @@ export const Browse = () => {
       />
       <Buttons />
       <BrowseBirthday currentDate={currentDate} setCurrentDate={setCurrentDate} />
-    </View>
+    </SafeAreaView>
   );
 };

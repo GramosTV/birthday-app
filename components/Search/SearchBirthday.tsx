@@ -1,4 +1,4 @@
-import { View, Text, Image, useColorScheme, FlatList, TouchableOpacity, PanResponder, Dimensions } from 'react-native';
+import { View, Text, Image, useColorScheme, FlatList, TouchableOpacity, PanResponder, Dimensions, SafeAreaView } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { getBirthdays } from '../../utils/AsyncStorage';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
@@ -104,18 +104,18 @@ export const SearchBirthday = ({ filteredBirthdays }: BrowseBirthdayProps) => {
   };
 
   return (
-    <View style={{ minHeight: '100%' }}>
+    <SafeAreaView style={{ minHeight: '100%' }}>
       <FlatList
         style={{
           zIndex: -1,
           flexGrow: 1,
-          paddingVertical: 40,
+          paddingVertical: 15,
         }}
         data={filteredBirthdays}
         numColumns={1}
         keyExtractor={(item, index) => index.toString()}
         renderItem={renderItem}
       />
-    </View>
+    </SafeAreaView>
   );
 };
