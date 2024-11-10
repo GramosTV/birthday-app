@@ -1,10 +1,10 @@
-import { StatusBar } from 'expo-status-bar';
 import {
   Animated,
   Dimensions,
   Easing,
   Platform,
   SafeAreaView,
+  StatusBar,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -58,17 +58,12 @@ const setupNotificationChannel = async () => {
 };
 
 TaskManager.defineTask('BIRTHDAY_NOTIFICATION_TASK', notifCheck);
-const SCHEDULED_KEY = 'isBirthdayNotificationScheduled';
 const scheduleBirthdayNotificationTask = async () => {
-  const isScheduled = await AsyncStorage.getItem(SCHEDULED_KEY);
-  if (isScheduled !== 'true') {
     await BackgroundFetch.registerTaskAsync('BIRTHDAY_NOTIFICATION_TASK', {
       minimumInterval: 60 * 60 * 24,
       stopOnTerminate: false,
       startOnBoot: true,
     });
-    await AsyncStorage.setItem(SCHEDULED_KEY, 'true');
-  }
 };
 export default function App() {
   const theme = useColorScheme() === 'dark';
@@ -196,7 +191,7 @@ export default function App() {
   }
   return (
     <NavigationContainer>
-       <StatusBar style={theme ? 'dark' : 'light'}/>
+       <StatusBar backgroundColor={theme ? '#000' : '#fff'}/>
       {/* <TouchableOpacity onPress={logActiveChannelsAndPendingNotifications}>
         <Text>Log</Text>
       </TouchableOpacity>
