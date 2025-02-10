@@ -1,37 +1,37 @@
-# Birthday App
+# 🎂 Birthday App
 
 This is a React Native application for managing birthdays. The app allows users to add, edit, and browse birthdays, and it provides notifications for upcoming birthdays.
 
-## Features
+## ✨ Features
 
-- Add new birthdays with details such as name, surname, notes, date, budget, color, and photo.
-- Edit existing birthdays.
-- Browse upcoming birthdays.
-- Search for birthdays by name or surname.
-- Export birthdays as JSON or CSV.
-- Receive notifications for upcoming birthdays.
+- ➕ Add new birthdays with details such as name, surname, notes, date, budget, color, and photo.
+- ✏️ Edit existing birthdays.
+- 📅 Browse upcoming birthdays.
+- 🔍 Search for birthdays by name or surname.
+- 📤 Export birthdays as JSON or CSV.
+- 🔔 Receive notifications for upcoming birthdays.
 
-## App Showcase
+## 📱 App Showcase
 
 Here are some GIFs showcasing the app:
 
-### Adding a Birthday
+### ➕ Adding a Birthday
 
 <img src="./readme-gifs/1.gif" height="600"/>
 
-### Layout
+### 🖼️ Layout
 
 <img src="./readme-gifs/2.gif" height="600"/>
 
-### Search & Edit
+### 🔍 Search & ✏️ Edit
 
 <img src="./readme-gifs/3.gif" height="600"/>
 
-### Export to CSV
+### 📤 Export to CSV
 
 <img src="./readme-gifs/4.gif" height="600"/>
 
-## Project Structure
+## 🗂️ Project Structure
 
 ```
 .
@@ -78,7 +78,7 @@ Here are some GIFs showcasing the app:
 └── tsconfig.json
 ```
 
-## Installation
+## ⚙️ Installation
 
 1. Clone the repository:
 
@@ -99,34 +99,34 @@ npm install
 npm start
 ```
 
-## Running on Android
+## 📱 Running on Android
 
 ```sh
 npm run android
 ```
 
-## Running on iOS
+## 📱 Running on iOS
 
 ```sh
 npm run ios
 ```
 
-### Notifications
+### 🔔 Notifications
 
 The app uses Expo Notifications to schedule birthday reminders. Ensure you have the necessary permissions set up on your device.
 
-### Exporting Birthdays
+### 📤 Exporting Birthdays
 
 You can export birthdays as JSON or CSV by clicking the export button on the main page.
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any changes.
 
-## Contact
+## 📧 Contact
 
 For any inquiries, please contact [gramowskimikolaj@gmail.com](gramowskimikolaj@gmail.com).
