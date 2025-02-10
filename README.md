@@ -17,19 +17,19 @@ Here are some GIFs showcasing the app:
 
 ### Adding a Birthday
 
-![Adding a Birthday](1.gif)
+![Adding a Birthday](./readme-gifs/1.gif)
 
 ### Layout
 
-![Layout](2.gif)
+![Layout](./readme-gifs/2.gif)
 
 ### Search & Edit
 
-![Search & Edit](3.gif)
+![Search & Edit](./readme-gifs/3.gif)
 
 ### Export to CSV
 
-![Export to CSV](4.gif)
+![Export to CSV](./readme-gifs/4.gif)
 
 ## Project Structure
 
