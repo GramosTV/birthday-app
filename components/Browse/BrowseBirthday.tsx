@@ -5,6 +5,12 @@ import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { Birthday } from '../../types';
 import moment from 'moment';
 import { MaterialIcons } from '@expo/vector-icons';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { getOrdinalSuffix } from '../../utils/getOrdinalSuffix';
+type RootStackParamList = {
+  BirthdayPage: { birthdayId: string };
+};
+type NavigationProps = NativeStackNavigationProp<RootStackParamList, 'BirthdayPage'>;
 const getNextBirthday = (birthDate: Date) => {
   const today = new Date();
   let nextBirthday = new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate());
@@ -18,19 +24,6 @@ const getNextBirthday = (birthDate: Date) => {
   }
   const dayOfWeek = nextBirthday.toLocaleDateString('en-US', { weekday: 'long' });
   const dayOfMonth = nextBirthday.getDate();
-  const getOrdinalSuffix = (day: number) => {
-    if (day > 3 && day < 21) return 'th';
-    switch (day % 10) {
-      case 1:
-        return 'st';
-      case 2:
-        return 'nd';
-      case 3:
-        return 'rd';
-      default:
-        return 'th';
-    }
-  };
   const ordinalSuffix = getOrdinalSuffix(dayOfMonth);
   return `${dayOfWeek} ${dayOfMonth}${ordinalSuffix}`;
 };
@@ -61,16 +54,15 @@ export const BrowseBirthday = ({ currentDate, setCurrentDate }: BrowseBirthdayPr
   const theme = useColorScheme() === 'dark';
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
   const isFocused = useIsFocused();
-  const navigation: any = useNavigation();
+  const navigation = useNavigation<NavigationProps>();
   const [swipeHandled, setSwipeHandled] = useState(false);
   useEffect(() => {
     (async () => {
       const data = await getBirthdays();
-      const currentMonth = currentDate.month(); // Use currentDate from props
-      const currentDay = currentDate.date(); // Get the current day from currentDate
-
+      const currentMonth = currentDate.month();
+      const currentDay = currentDate.date();
       const upcomingBirthdays = data.filter((bd: Birthday) => {
-        const birthdayDate = moment(bd.date); // Use moment to parse birthday date
+        const birthdayDate = moment(bd.date);
         return birthdayDate.month() === currentMonth && birthdayDate.date() >= currentDay;
       });
 
@@ -80,9 +72,7 @@ export const BrowseBirthday = ({ currentDate, setCurrentDate }: BrowseBirthdayPr
   const swipeResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
-      onPanResponderMove: (evt, gestureState) => {
-        // No action needed during the move; we will check the direction on release
-      },
+      onPanResponderMove: (evt, gestureState) => {},
       onPanResponderRelease: (evt, gestureState) => {
         const { dx } = gestureState;
 
@@ -116,7 +106,8 @@ export const BrowseBirthday = ({ currentDate, setCurrentDate }: BrowseBirthdayPr
       return newDate;
     });
   };
-  const renderItem = ({ item, index }: { item: any; index: number }) => {
+
+  const renderItem = ({ item, index }: { item: Birthday; index: number }) => {
     return (
       <TouchableOpacity
         style={{

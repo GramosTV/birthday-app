@@ -1,17 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, Image, TouchableOpacity, StyleSheet, Text, useColorScheme } from 'react-native';
+import React, { useState } from 'react';
+import { View, TextInput, Image, TouchableOpacity, StyleSheet, Text, useColorScheme } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Nav } from './Nav';
 import ColorPicker, { HueSlider, Panel1, Preview, Swatches } from 'reanimated-color-picker';
 import { saveBirthday } from '../utils/AsyncStorage';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { Birthday } from '../types';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+type RootStackParamList = {
+  BirthdayPage: { birthdayId: string };
+};
 
+type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
 export function Edit({ route }: any) {
-  const navigation: any = useNavigation();
-
-  // Assume we receive existing birthday data via route params
+  const navigation = useNavigation<NavigationProps>();
   const { birthday }: { birthday: Birthday } = route.params;
 
   const [name, setName] = useState(birthday.name);
@@ -46,11 +49,11 @@ export function Edit({ route }: any) {
     if (numericValue && parsedValue >= min && parsedValue <= max) {
       setValue(numericValue);
     } else if (!numericValue) {
-      setValue(''); // Allow clearing the input
+      setValue('');
     }
   };
 
-  const onSelectColor = ({ hex }: any) => {
+  const onSelectColor = ({ hex }: { hex: string }) => {
     setColor(hex);
   };
 
@@ -182,19 +185,6 @@ export function Edit({ route }: any) {
             <Preview />
             <Panel1 style={{ marginTop: 10 }} />
             <HueSlider style={{ marginTop: 10 }} />
-            {/* <Swatches
-              colors={[
-                '#f00', // Red
-                '#0f0', // Green
-                '#00f', // Blue
-                '#ff0', // Yellow
-                '#f0f', // Magenta
-                '#00ffff', // Cyan
-                '#ff4500', // Orange Red
-                '#8a2be2', // Blue Violet
-              ]}
-              style={{ marginTop: 10 }}
-            /> */}
           </ColorPicker>
           <View style={styles.photoSection}>
             <View style={[styles.input, { borderRadius: 15 }]}>
@@ -229,7 +219,6 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    // marginBottom: 10,
   },
   input: {
     flex: 1,
@@ -249,7 +238,6 @@ const styles = StyleSheet.create({
   photoSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    // marginBottom: 20,
   },
   photo: {
     width: 50,

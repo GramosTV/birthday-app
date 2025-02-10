@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, useColorScheme, PanResponder, Animated } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, useColorScheme, PanResponder, Animated } from 'react-native';
 import moment from 'moment';
 import { getBirthdays } from '../../utils/AsyncStorage';
 import { Birthday } from '../../types';
@@ -16,8 +16,8 @@ export const Calendar = ({ currentDate, setCurrentDate }: CalendarProps) => {
   const currentWeekdayIndex = today.day();
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
   const isFocused = useIsFocused();
-  
-  const fadeAnim = useRef(new Animated.Value(1)).current;  // Fade animation value
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const [swipeHandled, setSwipeHandled] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -26,19 +26,12 @@ export const Calendar = ({ currentDate, setCurrentDate }: CalendarProps) => {
     })();
   }, [isFocused]);
 
-  const renderHeader = () => {
-    return null;
-  };
-
-  const [swipeHandled, setSwipeHandled] = useState(false);
-
   const swipeResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
-      onPanResponderMove: (evt, gestureState) => {},
+      onPanResponderMove: () => {},
       onPanResponderRelease: (evt, gestureState) => {
         const { dx } = gestureState;
-
         if (!swipeHandled) {
           if (dx > 50) {
             handleSwipeRight();
@@ -79,7 +72,7 @@ export const Calendar = ({ currentDate, setCurrentDate }: CalendarProps) => {
 
   const fadeOut = (callback: () => void) => {
     Animated.timing(fadeAnim, {
-      toValue: 0,  // Fade out
+      toValue: 0,
       duration: 80,
       useNativeDriver: true,
     }).start(() => callback());
@@ -87,7 +80,7 @@ export const Calendar = ({ currentDate, setCurrentDate }: CalendarProps) => {
 
   const fadeIn = () => {
     Animated.timing(fadeAnim, {
-      toValue: 1,  // Fade in
+      toValue: 1,
       duration: 80,
       useNativeDriver: true,
     }).start();
@@ -171,7 +164,6 @@ export const Calendar = ({ currentDate, setCurrentDate }: CalendarProps) => {
 
   return (
     <Animated.View {...swipeResponder.panHandlers} style={[styles.container, { opacity: fadeAnim }]}>
-      {renderHeader()}
       {renderDaysOfWeek()}
       {renderDays()}
     </Animated.View>

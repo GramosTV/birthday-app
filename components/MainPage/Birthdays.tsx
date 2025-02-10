@@ -6,9 +6,15 @@ import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { Birthday } from '../../types';
 import moment from 'moment';
 import { MaterialIcons } from '@expo/vector-icons';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 interface BirthdayProps {
   currentDate: moment.Moment;
 }
+type RootStackParamList = {
+  BirthdayPage: { birthdayId: string };
+};
+
+type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
 export const Birthdays = ({ currentDate }: BirthdayProps) => {
   const theme = useColorScheme() === 'dark';
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
@@ -21,22 +27,20 @@ export const Birthdays = ({ currentDate }: BirthdayProps) => {
     })();
   }, [isFocused]);
 
-  // Separate upcoming and past birthdays
   const upcomingBirthdays = birthdays.filter((item) => {
-    const birthdayDate = moment(item.date); // Use moment for birthday date
+    const birthdayDate = moment(item.date);
     return birthdayDate.month() === currentDate.month() && birthdayDate.date() >= currentDate.date();
   });
 
   const pastBirthdays = birthdays.filter((item) => {
-    const birthdayDate = moment(item.date); // Use moment for birthday date
+    const birthdayDate = moment(item.date);
     return birthdayDate.month() === currentDate.month() && birthdayDate.date() < currentDate.date();
   });
 
-  // Combine both arrays
   const sortedBirthdays = [...upcomingBirthdays, ...pastBirthdays.reverse()];
-  const navigation: any = useNavigation();
+  const navigation = useNavigation<NavigationProps>();
 
-  const renderItem = ({ item }: any) => {
+  const renderItem = ({ item }: { item: Birthday }) => {
     const isPast = moment(item.date).date() < currentDate.date();
     const opacityStyle = isPast ? { opacity: 0.5 } : { opacity: 1 };
 
@@ -55,12 +59,7 @@ export const Birthdays = ({ currentDate }: BirthdayProps) => {
           })
         }
       >
-        <Image
-          width={80}
-          height={80}
-          source={{ uri: item.image }}
-          style={[{ borderRadius: 40 }, opacityStyle]} // Apply opacity based on whether it's past
-        />
+        <Image width={80} height={80} source={{ uri: item.image }} style={[{ borderRadius: 40 }, opacityStyle]} />
         <View
           style={{
             borderWidth: 2,
@@ -108,10 +107,7 @@ export const Birthdays = ({ currentDate }: BirthdayProps) => {
               position: 'absolute',
               top: '50%',
               left: '50%',
-              transform: [
-                { translateX: -25 }, // Move left by half of its width (60 / 2)
-                { translateY: -25 }, // Move up by half of its height (60 / 2)
-              ],
+              transform: [{ translateX: -25 }, { translateY: -25 }],
             }}
           />
         </View>

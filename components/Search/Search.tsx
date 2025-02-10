@@ -1,18 +1,22 @@
-import { Animated, Dimensions, Easing, TextInput, TouchableOpacity, View, useColorScheme } from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import { View, useColorScheme } from 'react-native';
+import React from 'react';
 import { Nav } from '../Nav';
-import { Buttons } from '../MainPage/Buttons';
-import moment from 'moment';
 import { SearchBirthday } from './SearchBirthday';
-import { MaterialIcons } from '@expo/vector-icons';
-import { useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
-import { getBirthdays } from '../../utils/AsyncStorage';
+import { useRoute, RouteProp } from '@react-navigation/native';
 import { Birthday } from '../../types';
 
+type RouteParams = {
+  params: {
+    filteredBirthdays?: Birthday[];
+    inputText?: string;
+    allBirthdays?: Birthday[];
+  };
+};
+
 export const Search = () => {
+  const route = useRoute<RouteProp<RouteParams>>();
   const theme = useColorScheme() === 'dark';
-  const route = useRoute();
-  const { filteredBirthdays, inputText, allBirthdays } = route.params as any;
+  const { filteredBirthdays = [], inputText = '', allBirthdays = [] } = route.params || {};
 
   return (
     <View

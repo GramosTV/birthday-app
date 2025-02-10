@@ -16,9 +16,7 @@ export const Birthday = ({ birthday }: BirthdayProps) => {
       <View style={{ flexDirection: 'row' }}>
         <Image
           source={{
-            uri:
-              birthday.image ||
-              'https://upload.wikimedia.org/wikipedia/en/thumb/0/09/Skibidi_toilet_screenshot.webp/220px-Skibidi_toilet_screenshot.webp.png',
+            uri: birthday.image,
           }}
           width={80}
           height={80}

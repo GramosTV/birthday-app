@@ -1,10 +1,10 @@
-import JSZip from "jszip";
-import { Birthday } from "../types";
-import { getBirthdays, saveBirthday } from "./AsyncStorage";
+import JSZip from 'jszip';
+import { Birthday } from '../types';
+import { getBirthdays, saveBirthday } from './AsyncStorage';
 import * as Notifications from 'expo-notifications';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import { format } from "date-fns";
+import { format } from 'date-fns';
 
 export const getCurrentMonth = (): string => {
   return new Date().toLocaleDateString('default', { month: 'long' });
@@ -31,13 +31,13 @@ export const getSecondsUntilDate = ({ day, month, hour, minute }: SecondsProps) 
 };
 
 export const notifCheck = async () => {
-  console.log('run')
+  console.log('run');
   try {
     const birthdays = await getBirthdays();
     const now = new Date();
-    console.log(birthdays.length)
+    console.log(birthdays.length);
     for (let birthday of birthdays) {
-      console.log('run2')
+      console.log('run2');
       const birthdayDate = new Date(birthday.date);
       birthdayDate.setFullYear(now.getFullYear());
       if (birthday.notificationId) {
@@ -76,7 +76,7 @@ export const notifCheck = async () => {
   } catch (error) {
     console.error('Error scheduling birthday notifications:', error);
   }
-}
+};
 
 export const isBirthdayToday = (birthDate: Date) => {
   const today = new Date();
@@ -86,7 +86,7 @@ export const isBirthdayToday = (birthDate: Date) => {
   const todayDay = today.getDate();
 
   const isLeapYear = (year: number) => {
-    return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
   };
 
   if (birthMonth === 1 && birthDay === 29) {
@@ -100,7 +100,7 @@ export const isBirthdayToday = (birthDate: Date) => {
   return birthMonth === todayMonth && birthDay === todayDay;
 };
 
-const jsonToCsv = (json: any[]): string => {
+const jsonToCsv = (json: Birthday[]): string => {
   const header = Object.keys(json[0]).join(',');
   const rows = json.map((row) => Object.values(row).join(','));
   return [header, ...rows].join('\n');
@@ -139,7 +139,7 @@ export const exportBirthdays = async (exportAsJson: boolean) => {
     fileName = csvFileName;
   }
   zip.file(fileName, fileContent);
-  const content: any = await zip.generateAsync({ type: 'base64' });
+  const content = await zip.generateAsync({ type: 'base64' });
   const zipPath = FileSystem.documentDirectory + zipFileName;
   await FileSystem.writeAsStringAsync(zipPath, content, {
     encoding: FileSystem.EncodingType.Base64,

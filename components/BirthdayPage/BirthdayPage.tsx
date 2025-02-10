@@ -1,19 +1,21 @@
-import { View, Text, ScrollView, useColorScheme } from 'react-native';
 import React, { useEffect, useState } from 'react';
+import { ScrollView, useColorScheme } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useIsFocused } from '@react-navigation/native';
+import ConfettiCannon from 'react-native-confetti-cannon';
 import { Birthday } from '../Birthday';
 import { Nav } from '../Nav';
 import { QuickNote } from './QuickNote';
 import { getBirthdayById } from '../../utils/AsyncStorage';
-import { Birthday as bd } from '../../types';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useIsFocused } from '@react-navigation/native';
 import { isBirthdayToday } from '../../utils/Misc';
-import ConfettiCannon from 'react-native-confetti-cannon';
+import { Birthday as bd } from '../../types';
+
 export const BirthdayPage = ({ route }: any) => {
   const { birthdayId } = route.params;
-  const [birthday, setBirthday] = useState<bd>();
+  const [birthday, setBirthday] = useState<bd | null>(null);
   const theme = useColorScheme() === 'dark';
   const isFocused = useIsFocused();
+
   useEffect(() => {
     (async () => {
       const bd = await getBirthdayById(birthdayId);
@@ -21,7 +23,7 @@ export const BirthdayPage = ({ route }: any) => {
     })();
   }, [isFocused]);
 
-  if (!birthday)
+  if (!birthday) {
     return (
       <SafeAreaView
         style={{
@@ -33,8 +35,9 @@ export const BirthdayPage = ({ route }: any) => {
           minHeight: '100%',
           backgroundColor: theme ? '#000' : '#fff',
         }}
-      ></SafeAreaView>
+      />
     );
+  }
 
   const getDaysUntilBirthday = () => {
     if (!birthday) return null;
@@ -47,8 +50,7 @@ export const BirthdayPage = ({ route }: any) => {
     }
 
     const timeDiff = birthdayDate.getTime() - today.getTime();
-    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-    return daysDiff;
+    return Math.ceil(timeDiff / (1000 * 3600 * 24));
   };
 
   const daysUntilBirthday = getDaysUntilBirthday();
@@ -64,9 +66,9 @@ export const BirthdayPage = ({ route }: any) => {
         backgroundColor: theme ? '#000' : '#fff',
       }}
     >
-      {isBirthdayToday(new Date(birthday.date)) ? (
+      {isBirthdayToday(new Date(birthday.date)) && (
         <ConfettiCannon count={350} origin={{ x: -10, y: 0 }} autoStartDelay={0} />
-      ) : null}
+      )}
 
       <ScrollView style={{ width: '100%' }}>
         <Nav
@@ -78,8 +80,8 @@ export const BirthdayPage = ({ route }: any) => {
           bottomLeft={
             isBirthdayToday(new Date(birthday.date)) ? `Just turned ${birthdayAge}` : `Will turn ${birthdayAge}`
           }
-          topRight={'Budget'}
-          bottomRight={'$' + String(birthday?.budget)}
+          topRight="Budget"
+          bottomRight={`$${birthday?.budget}`}
         />
         <Birthday birthday={birthday} />
         <QuickNote birthday={birthday} />

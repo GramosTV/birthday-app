@@ -1,38 +1,27 @@
-import {
-  Animated,
-  Dimensions,
-  Easing,
-  Platform,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { Calendar } from './components/MainPage/Calendar';
-import { useColorScheme, Text } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, Easing, Platform, StatusBar, TextInput, TouchableOpacity, View } from 'react-native';
+import { useColorScheme } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Notifications from 'expo-notifications';
+import * as BackgroundFetch from 'expo-background-fetch';
+import * as TaskManager from 'expo-task-manager';
+import { MaterialIcons } from '@expo/vector-icons';
+
 import { MainPage } from './components/MainPage/MainPage';
-import * as Font from 'expo-font';
-import { useEffect, useRef, useState } from 'react';
 import { BirthdayPage } from './components/BirthdayPage/BirthdayPage';
 import { Create } from './components/Create';
 import { Browse } from './components/Browse/Browse';
-import { NavigationContainer, useIsFocused, useNavigation } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import * as Notifications from 'expo-notifications';
 import { Edit } from './components/Edit';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as BackgroundFetch from 'expo-background-fetch';
-import { deleteAllBirthdays, getBirthdays, saveBirthday } from './utils/AsyncStorage';
-import * as TaskManager from 'expo-task-manager';
-import { exportBirthdays, getSecondsUntilDate, notifCheck } from './utils/Misc';
-import { MaterialIcons } from '@expo/vector-icons';
 import { Search } from './components/Search/Search';
-import { Birthday } from './types';
 import { Searcher } from './components/Searcher';
+import { getBirthdays } from './utils/AsyncStorage';
+import { notifCheck } from './utils/Misc';
+import { Birthday } from './types';
 
 const Stack = createNativeStackNavigator();
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -40,33 +29,41 @@ Notifications.setNotificationHandler({
     shouldSetBadge: true,
   }),
 });
+
 const setupNotificationChannel = async () => {
   if (Platform.OS === 'android') {
-    // const channelSet = await AsyncStorage.getItem('notificationChannelSet');
-    // if (channelSet !== 'true') {
     console.log('set channel');
     await Notifications.setNotificationChannelAsync('birthday-reminders', {
       name: 'Birthday Reminders',
       importance: Notifications.AndroidImportance.HIGH,
-      sound: 'default', // Can be customized
-      vibrationPattern: [0, 250, 250, 250], // Optional vibration pattern
-      // lightColor: '#FF231F7C', // Optional LED light color
+      sound: 'default',
+      vibrationPattern: [0, 250, 250, 250],
     });
     await AsyncStorage.setItem('notificationChannelSet', 'true');
   }
-  // }
 };
 
 TaskManager.defineTask('BIRTHDAY_NOTIFICATION_TASK', notifCheck);
+
 const scheduleBirthdayNotificationTask = async () => {
-    await BackgroundFetch.registerTaskAsync('BIRTHDAY_NOTIFICATION_TASK', {
-      minimumInterval: 60 * 60 * 24,
-      stopOnTerminate: false,
-      startOnBoot: true,
-    });
+  await BackgroundFetch.registerTaskAsync('BIRTHDAY_NOTIFICATION_TASK', {
+    minimumInterval: 60 * 60 * 24,
+    stopOnTerminate: false,
+    startOnBoot: true,
+  });
 };
+
 export default function App() {
   const theme = useColorScheme() === 'dark';
+  const [allBirthdays, setAllBirthdays] = useState<Birthday[]>([]);
+  const [inputText, setInputText] = useState('');
+  const [filteredBirthdays, setFilteredBirthdays] = useState<Birthday[]>([]);
+  const [searchFlag, setSearchFlag] = useState<null | boolean | 0>(null);
+  const [isInputVisible, setIsInputVisible] = useState(false);
+
+  const inputWidth = useRef(new Animated.Value(0)).current;
+  const inputPadding = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     (async () => {
       const { status } = await Notifications.getPermissionsAsync();
@@ -77,28 +74,17 @@ export default function App() {
       await scheduleBirthdayNotificationTask();
     })();
   }, []);
-  const [allBirthdays, setAllBirthdays] = useState<Birthday[]>([]);
 
-  // const isFocused = useIsFocused();
   useEffect(() => {
     (async () => {
       const birthdays = await getBirthdays();
       setAllBirthdays(birthdays);
     })();
-
-    // setTimeout(() => toggleInput(), 250);
   }, []);
-  const [isInputVisible, setIsInputVisible] = useState(false);
-  const inputWidth = useRef(new Animated.Value(0)).current; // Initial width is 0
-  // const navigation = useNavigation();
-  const inputPadding = useRef(new Animated.Value(0)).current; // Initial paddingHorizontal is 0
-  const [inputText, setInputText] = useState('');
-  const [filteredBirthdays, setFilteredBirthdays] = useState<Birthday[]>([]);
-  const [searchFlag, setSearchFlag] = useState<null | boolean | 0>(null);
+
   const toggleInput = () => {
     if (isInputVisible) {
       setSearchFlag(0);
-      // Animate the TextInput width and padding back to 0 when hiding it
       Animated.parallel([
         Animated.timing(inputWidth, {
           toValue: 0,
@@ -107,25 +93,24 @@ export default function App() {
           easing: Easing.linear,
         }),
         Animated.timing(inputPadding, {
-          toValue: 0, // Reduce padding to 0
+          toValue: 0,
           duration: 230,
           useNativeDriver: false,
           easing: Easing.linear,
         }),
       ]).start(() => setIsInputVisible(false));
     } else {
-      // Animate the TextInput width and padding when showing it
       setIsInputVisible(true);
       setSearchFlag((prev) => !prev);
       Animated.parallel([
         Animated.timing(inputWidth, {
-          toValue: 250, // Target width
+          toValue: 250,
           duration: 230,
           useNativeDriver: false,
           easing: Easing.linear,
         }),
         Animated.timing(inputPadding, {
-          toValue: 10, // Target paddingHorizontal
+          toValue: 10,
           duration: 230,
           useNativeDriver: false,
           easing: Easing.linear,
@@ -133,6 +118,7 @@ export default function App() {
       ]).start();
     }
   };
+
   const filterBirthdays = (text: string) => {
     setInputText(text);
     const filtered = allBirthdays.filter(
@@ -142,90 +128,14 @@ export default function App() {
     );
     setFilteredBirthdays(filtered);
   };
-  const formatDate = (seconds: number) => {
-    const date = new Date(Date.now() + seconds * 1000);
-    const day = String(date.getDate()).padStart(2, '0'); // Add leading zero if needed
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
 
-  const logActiveChannelsAndPendingNotifications = async () => {
-    // await Notifications.cancelAllScheduledNotificationsAsync();
-    if (Platform.OS === 'android') {
-      // Log active notification channels
-      const channels = await Notifications.getNotificationChannelsAsync();
-      console.log('Active Notification Channels:', channels);
-    } else {
-      console.log('Notification channels are only available on Android.');
-    }
-
-    // Log all pending (scheduled) notifications
-    const pendingNotifications = await Notifications.getAllScheduledNotificationsAsync();
-    console.log('Pending Notifications:', pendingNotifications.length);
-
-    // Format and log notifications
-    pendingNotifications.forEach((notification) => {
-      const id = notification.identifier; // Get the notification ID
-      const title: any = notification.content.title;
-      const name = title.replace('🎉 Happy Birthday, ', '').replace('!', '').trim(); // Extract the name
-      const seconds = (notification.trigger as any).seconds; // Get the seconds for the trigger
-      const dateOfNotif = formatDate(seconds); // Format the date
-    
-      console.log(`ID: ${id}, Name: ${name}, Date: ${dateOfNotif}`);
-    });
-  };
-
-  const simulateBirthdayNotification = async (birthday: any) => {
-    return await Notifications.scheduleNotificationAsync({
-      content: {
-        title: `🎉 Happy Birthday, ${birthday.name}!`,
-        body: `Don't forget to wish ${birthday.name} ${birthday.surname} a happy birthday!`,
-        data: { birthdayId: birthday.id },
-      },
-      trigger: { seconds: 5 }, // Triggers notification in 5 seconds
-    });
-  };
-  const unregisterTasks = async () => {
-    await TaskManager.unregisterAllTasksAsync()
-  }
   return (
     <NavigationContainer>
-       <StatusBar backgroundColor={theme ? '#000' : '#fff'}/>
-      {/* <TouchableOpacity onPress={logActiveChannelsAndPendingNotifications}>
-        <Text>Log</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={deleteAllBirthdays}>
-        <Text>Delete all</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => simulateBirthdayNotification({
-    name: "John",
-    surname: "Doe",
-    id: "12345",
-    date: "2024-11-09"
-  })}>
-    <Text>Test notif</Text>
-    </TouchableOpacity>
-    <TouchableOpacity onPress={notifCheck}>
-    <Text>Notif check</Text>
-    </TouchableOpacity>
-    <TouchableOpacity onPress={unregisterTasks}>
-      <Text>Unregister tasks</Text>
-    </TouchableOpacity>
-    <TouchableOpacity onPress={() => exportBirthdays(false)}>
-    <Text>Export</Text>
-    </TouchableOpacity> */}
+      <StatusBar backgroundColor={theme ? '#000' : '#fff'} />
       <Stack.Navigator initialRouteName="MainPage">
-        
         <Stack.Screen name="MainPage" component={MainPage} options={{ headerShown: false }} />
         <Stack.Screen name="BirthdayPage" component={BirthdayPage} options={{ headerShown: false }} />
-        <Stack.Screen
-          name="Create"
-          component={Create}
-          options={{
-            headerShown: false,
-          }}
-        />
+        <Stack.Screen name="Create" component={Create} options={{ headerShown: false }} />
         <Stack.Screen
           name="Search"
           component={Search}
@@ -272,21 +182,16 @@ export default function App() {
               borderRadius: 20,
               backgroundColor: '#232323',
             }}
-            onPress={() => toggleInput()}
+            onPress={toggleInput}
           >
-            <MaterialIcons name="search" size={34} color={'white'} />
+            <MaterialIcons name="search" size={34} color="white" />
           </TouchableOpacity>
-
-          {/* Animated TextInput */}
           {isInputVisible && (
             <Animated.View
               style={{
-                width: inputWidth, // Animated width
+                width: inputWidth,
                 height: '100%',
-                // backgroundColor: theme ? '#333' : '#f0f0f0',
                 borderRadius: 20,
-                // justifyContent: 'center',
-                // alignItems: 'center',
                 paddingVertical: 15,
                 paddingHorizontal: inputPadding,
               }}

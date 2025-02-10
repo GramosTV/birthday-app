@@ -4,7 +4,6 @@ import { Nav } from '../Nav';
 import { Buttons } from '../MainPage/Buttons';
 import { BrowseBirthday } from './BrowseBirthday';
 import moment from 'moment';
-import { StatusBar } from 'expo-status-bar';
 
 export const Browse = () => {
   const theme = useColorScheme() === 'dark';
@@ -13,8 +12,8 @@ export const Browse = () => {
 
   useEffect(() => {
     const updateTime = () => {
-      const now = moment(); // Use moment to get the current time
-      const formattedTime = now.format('HH:mm'); // Format time as HH:MM
+      const now = moment();
+      const formattedTime = now.format('HH:mm');
       setCurrentTime(formattedTime);
     };
 
@@ -32,12 +31,11 @@ export const Browse = () => {
         backgroundColor: theme ? '#000' : '#fff',
       }}
     >
-      
       <Nav
         topLeft={'Upcoming'}
-        bottomLeft={currentDate.format('MMMM')} // Get current month name
+        bottomLeft={currentDate.format('MMMM')}
         topRight={currentTime}
-        bottomRight={currentDate.year().toString()} // Get current year
+        bottomRight={currentDate.year().toString()}
       />
       <Buttons />
       <BrowseBirthday currentDate={currentDate} setCurrentDate={setCurrentDate} />

@@ -2,23 +2,29 @@ import { View, Text, useColorScheme, TouchableOpacity, Alert } from 'react-nativ
 import React from 'react';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { deleteAllBirthdays } from '../../utils/AsyncStorage';
 import { exportBirthdays } from '../../utils/Misc';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+type RootStackParamList = {
+  MainPage: undefined;
+  Browse: undefined;
+  Create: undefined;
+};
 
+type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
 export const Buttons = () => {
   const theme = useColorScheme() === 'dark';
-  const navigation: any = useNavigation();
+  const navigation = useNavigation<NavigationProps>();
   const handleExport = () => {
     Alert.alert(
-      "Choose Export Format",
-      "Do you want to export as JSON or CSV?",
+      'Choose Export Format',
+      'Do you want to export as JSON or CSV?',
       [
         {
-          text: "JSON",
+          text: 'JSON',
           onPress: async () => await exportBirthdays(true),
         },
         {
-          text: "CSV",
+          text: 'CSV',
           onPress: async () => await exportBirthdays(false),
         },
       ],
@@ -72,12 +78,14 @@ export const Buttons = () => {
           <Text style={{ fontSize: 14, color: theme ? '#fff' : '#000', fontFamily: 'Regular' }}>Events</Text>
         </TouchableOpacity>
       </View>
-      <View style={{
+      <View
+        style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-        }}>
-      <TouchableOpacity
+        }}
+      >
+        <TouchableOpacity
           style={{
             width: 53,
             height: 53,
@@ -88,24 +96,24 @@ export const Buttons = () => {
             borderRadius: 53,
             marginRight: 10,
           }}
-          onPress={handleExport} // Replace with actual export function
+          onPress={handleExport}
         >
           <AntDesign name="export" size={27} color={theme ? '#fff' : '#000'} />
         </TouchableOpacity>
-      <TouchableOpacity
-        style={{
-          width: 53,
-          height: 53,
-          justifyContent: 'center',
-          alignItems: 'center',
-          borderColor: theme ? '#fff' : '#000',
-          borderWidth: 2,
-          borderRadius: 53,
-        }}
-        onPress={() => navigation.navigate('Create')}
-      >
-        <AntDesign name="plus" size={27} color={theme ? '#fff' : '#000'} />
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            width: 53,
+            height: 53,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderColor: theme ? '#fff' : '#000',
+            borderWidth: 2,
+            borderRadius: 53,
+          }}
+          onPress={() => navigation.navigate('Create')}
+        >
+          <AntDesign name="plus" size={27} color={theme ? '#fff' : '#000'} />
+        </TouchableOpacity>
       </View>
     </View>
   );

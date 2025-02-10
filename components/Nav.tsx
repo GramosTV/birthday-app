@@ -1,5 +1,5 @@
 import { View, Text, useColorScheme } from 'react-native';
-import React, { useEffect } from 'react';
+import React from 'react';
 interface NavProps {
   topLeft: string;
   bottomLeft: string;

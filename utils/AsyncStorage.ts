@@ -4,39 +4,34 @@ import { Birthday } from '../types';
 import * as Notifications from 'expo-notifications';
 import { notifCheck } from './Misc';
 
+const moveBirthdayImage = async (imageUri: string): Promise<string> => {
+  const filename = imageUri.split('/').pop();
+  const newPath = `${FileSystem.documentDirectory}${filename}`;
+  await FileSystem.moveAsync({
+    from: imageUri,
+    to: newPath,
+  });
+  return newPath;
+};
+
 export const saveBirthday = async (birthday: Birthday, notifChecking = false) => {
   try {
     const storedBirthdays = await AsyncStorage.getItem('birthdays');
     const currentBirthdays: Birthday[] = storedBirthdays ? JSON.parse(storedBirthdays) : [];
-    const existingBirthdayIndex = currentBirthdays.findIndex((b: Birthday) => b.id === birthday.id);
+    const existingIndex = currentBirthdays.findIndex((b) => b.id === birthday.id);
 
-    if (existingBirthdayIndex !== -1) {
-      const existingBirthday = currentBirthdays[existingBirthdayIndex];
+    if (existingIndex !== -1) {
+      const existingBirthday = currentBirthdays[existingIndex];
       if (existingBirthday.image !== birthday.image) {
         await FileSystem.deleteAsync(existingBirthday.image);
-        const imageUri = birthday.image;
-        const filename = imageUri.split('/').pop();
-        const newPath = `${FileSystem.documentDirectory}${filename}`;
-        await FileSystem.moveAsync({
-          from: imageUri,
-          to: newPath,
-        });
-        birthday.image = newPath;
+        birthday.image = await moveBirthdayImage(birthday.image);
       }
-      currentBirthdays[existingBirthdayIndex] = birthday;
+      currentBirthdays[existingIndex] = birthday;
     } else {
-      const imageUri = birthday.image;
-      const filename = imageUri.split('/').pop();
-      const newPath = `${FileSystem.documentDirectory}${filename}`;
-      await FileSystem.moveAsync({
-        from: imageUri,
-        to: newPath,
-      });
-      birthday.image = newPath;
-      // const notificationId = await scheduleBirthdayNotification(birthday);
-      // birthday.notificationId = notificationId;
+      birthday.image = await moveBirthdayImage(birthday.image);
       currentBirthdays.push(birthday);
     }
+
     currentBirthdays.sort((a, b) => {
       const dateA = new Date(a.date);
       const dateB = new Date(b.date);
@@ -45,7 +40,9 @@ export const saveBirthday = async (birthday: Birthday, notifChecking = false) =>
       }
       return dateA.getDate() - dateB.getDate();
     });
+
     await AsyncStorage.setItem('birthdays', JSON.stringify(currentBirthdays));
+
     if (!notifChecking) {
       await notifCheck();
     }
@@ -53,7 +50,6 @@ export const saveBirthday = async (birthday: Birthday, notifChecking = false) =>
     console.error('Error saving birthday:', error);
   }
 };
-
 
 export const getBirthdays = async (): Promise<Birthday[]> => {
   try {
@@ -65,12 +61,11 @@ export const getBirthdays = async (): Promise<Birthday[]> => {
   }
 };
 
-export const getBirthdayById = async (id: string) => {
+export const getBirthdayById = async (id: string): Promise<Birthday | null> => {
   try {
     const storedBirthdays = await AsyncStorage.getItem('birthdays');
     const birthdays = storedBirthdays ? JSON.parse(storedBirthdays) : [];
-    const birthday = birthdays.find((birthday: Birthday) => birthday.id === id);
-    return birthday || null;
+    return birthdays.find((b: Birthday) => b.id === id) || null;
   } catch (error) {
     console.error('Error retrieving birthday by id:', error);
     return null;
@@ -79,18 +74,16 @@ export const getBirthdayById = async (id: string) => {
 
 export const deleteBirthday = async (id: string) => {
   try {
-    const jsonValue = await AsyncStorage.getItem('birthdays');
-    const birthdays = jsonValue != null ? JSON.parse(jsonValue) : [];
-    const birthdayToDelete = birthdays.find((birthday: Birthday) => birthday.id === id);
+    const storedBirthdays = await AsyncStorage.getItem('birthdays');
+    const birthdays = storedBirthdays ? JSON.parse(storedBirthdays) : [];
+    const birthdayToDelete = birthdays.find((b: Birthday) => b.id === id);
 
-    if (birthdayToDelete && birthdayToDelete.notificationId) {
+    if (birthdayToDelete?.notificationId) {
       try {
         const scheduledNotifications = await Notifications.getAllScheduledNotificationsAsync();
-
         const notificationExists = scheduledNotifications.some(
           (notification) => notification.identifier === birthdayToDelete.notificationId
         );
-
         if (notificationExists) {
           await Notifications.cancelScheduledNotificationAsync(birthdayToDelete.notificationId);
           console.log(`Notification for birthday ${id} canceled successfully.`);
@@ -102,7 +95,7 @@ export const deleteBirthday = async (id: string) => {
       }
     }
 
-    const updatedBirthdays = birthdays.filter((birthday: Birthday) => birthday.id !== id);
+    const updatedBirthdays = birthdays.filter((b: Birthday) => b.id !== id);
     await AsyncStorage.setItem('birthdays', JSON.stringify(updatedBirthdays));
     console.log('Birthday deleted successfully:', id);
   } catch (error) {
@@ -110,12 +103,9 @@ export const deleteBirthday = async (id: string) => {
   }
 };
 
-
-
 export const deleteAllBirthdays = async () => {
   try {
     await Notifications.cancelAllScheduledNotificationsAsync();
-    // await AsyncStorage.removeItem('birthdays');
     console.log('All birthdays deleted successfully.');
   } catch (error) {
     console.error('Error deleting all birthdays:', error);
@@ -145,4 +135,3 @@ const scheduleBirthdayNotification = async (birthday: Birthday) => {
     },
   });
 };
-

@@ -2,12 +2,19 @@ import { View, Text, useColorScheme, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { Birthday as bd } from '../../types';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+type RootStackParamList = {
+  Edit: { birthday: bd };
+};
+type NavigationProps = NativeStackNavigationProp<RootStackParamList, 'Edit'>;
 interface BirthdayProps {
   birthday: bd;
 }
+
 export const QuickNote = ({ birthday }: BirthdayProps) => {
   const theme = useColorScheme() === 'dark';
-  const navigation: any = useNavigation();
+  const navigation = useNavigation<NavigationProps>();
+
   return (
     <View style={{ marginTop: 40 }}>
       <Text style={{ color: theme ? '#fff' : '#000', fontSize: 22, fontFamily: 'Bold' }}>NOTES</Text>

@@ -1,33 +1,29 @@
 import React, { useState } from 'react';
-import {
-  View,
-  TextInput,
-  Button,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  SafeAreaView,
-} from 'react-native';
+import { View, TextInput, Image, TouchableOpacity, StyleSheet, Text, useColorScheme } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Nav } from './Nav';
 import ColorPicker, { HueSlider, Panel1, Preview, Swatches } from 'reanimated-color-picker';
 import { saveBirthday } from '../utils/AsyncStorage';
 import { useNavigation } from '@react-navigation/native';
 import uuid from 'react-native-uuid';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+type RootStackParamList = {
+  MainPage: undefined;
+};
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 export function Create() {
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
   const [notes, setNotes] = useState('');
-  const [day, setDay] = useState<any>(null);
-  const [month, setMonth] = useState<any>(null);
-  const [year, setYear] = useState<any>(null);
-  const [budget, setBudget] = useState<any>(null);
-  const [color, setColor] = useState('#595959');
-  const [photo, setPhoto] = useState<any>(null);
+  const [day, setDay] = useState<string>('');
+  const [month, setMonth] = useState<string>('');
+  const [year, setYear] = useState<string>('');
+  const [budget, setBudget] = useState<string>('');
+  const [color, setColor] = useState<string>('#595959');
+  const [photo, setPhoto] = useState<string | null>(null);
   const theme = useColorScheme() === 'dark';
-  const navigation: any = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
   const pickImage = async () => {
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
@@ -51,26 +47,26 @@ export function Create() {
     if (numericValue && parsedValue >= min && parsedValue <= max) {
       setValue(numericValue);
     } else if (!numericValue) {
-      setValue(''); // Allow clearing the input
+      setValue('');
     }
   };
-  const onSelectColor = ({ hex }: any) => {
+  const onSelectColor = ({ hex }: { hex: string }) => {
     setColor(hex);
   };
-  const dateOfBirth = new Date(year, month - 1, day);
+  const dateOfBirth = new Date(Number(year), Number(month) - 1, Number(day));
   const checkIfReady = () => {
     return name && surname && day && month && year && budget && photo;
   };
   const submit = async () => {
     await saveBirthday({
-      id: uuid.v4(),
+      id: uuid.v4() as string,
       name,
       surname,
       notes,
       date: dateOfBirth,
       budget: Number(budget),
       color,
-      image: photo,
+      image: photo || '',
     });
     navigation.navigate('MainPage');
   };
@@ -143,7 +139,7 @@ export function Create() {
             placeholder="Day"
             placeholderTextColor="#666"
             value={day}
-            onChangeText={(value) => handleNumericInput(value, setDay, 1, 31)} // Day validation
+            onChangeText={(value) => handleNumericInput(value, setDay, 1, 31)}
             keyboardType="numeric"
           />
           <TextInput
@@ -151,7 +147,7 @@ export function Create() {
             placeholder="Month"
             placeholderTextColor="#666"
             value={month}
-            onChangeText={(value) => handleNumericInput(value, setMonth, 1, 12)} // Month validation
+            onChangeText={(value) => handleNumericInput(value, setMonth, 1, 12)}
             keyboardType="numeric"
           />
           <TextInput
@@ -162,7 +158,7 @@ export function Create() {
             placeholder="Year"
             placeholderTextColor="#666"
             value={year}
-            onChangeText={(value) => handleNumericInput(value, setYear, 110, new Date().getFullYear())} // Year validation
+            onChangeText={(value) => handleNumericInput(value, setYear, 110, new Date().getFullYear())}
             keyboardType="numeric"
           />
         </View>
@@ -248,7 +244,6 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    // marginBottom: 10,
   },
   input: {
     flex: 1,
@@ -268,7 +263,6 @@ const styles = StyleSheet.create({
   photoSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    // marginBottom: 20,
   },
   photo: {
     width: 50,

@@ -1,24 +1,23 @@
-import { View, Text, ScrollView, useColorScheme, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
+import { useColorScheme } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import moment from 'moment';
+
 import { Calendar } from './Calendar';
 import { Nav } from '../Nav';
 import { Birthdays } from './Birthdays';
 import { Buttons } from './Buttons';
 import { getBirthdays } from '../../utils/AsyncStorage';
 import { Birthday } from '../../types';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { getCurrentMonth } from '../../utils/Misc';
-import { useIsFocused, useNavigation } from '@react-navigation/native';
-import moment from 'moment';
-import { MaterialIcons } from '@expo/vector-icons';
-import { StatusBar } from 'expo-status-bar';
 
 export const MainPage = () => {
   const theme = useColorScheme() === 'dark';
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
   const isFocused = useIsFocused();
   const [currentDate, setCurrentDate] = useState(moment());
-  const navigation: any = useNavigation();
+  const navigation = useNavigation();
+
   useEffect(() => {
     (async () => {
       const data = await getBirthdays();
@@ -27,25 +26,22 @@ export const MainPage = () => {
   }, [isFocused]);
 
   const countBirthdaysInCurrentMonth = (birthdays: Birthday[]) => {
-    const currentMonth = currentDate.month(); // Get the current month using moment
-    return birthdays.filter((birthday) => {
-      const birthdayDate = moment(birthday.date); // Convert birthday.date to moment
-      return birthdayDate.month() === currentMonth; // Compare the month
-    }).length;
+    const currentMonth = currentDate.month();
+    return birthdays.filter((birthday) => moment(birthday.date).month() === currentMonth).length;
   };
+
   const countBudgetInCurrentMonth = (birthdays: Birthday[]) => {
     return (
       '$' +
       birthdays.reduce((accumulator, current: Birthday) => {
-        const birthdayDate = moment(current.date); // Use moment to parse the date
-        if (birthdayDate.month() === currentDate.month()) {
-          // Check the month and year
+        if (moment(current.date).month() === currentDate.month()) {
           return accumulator + current.budget;
         }
         return accumulator;
       }, 0)
     );
   };
+
   return (
     <SafeAreaView
       style={{
@@ -57,20 +53,16 @@ export const MainPage = () => {
         position: 'relative',
       }}
     >
-     
-      {/* <ScrollView> */}
       <Nav
-        topLeft={'Upcoming'}
+        topLeft="Upcoming"
         bottomLeft={currentDate.format('MMMM')}
-        topRight={'Budget'}
+        topRight="Budget"
         bottomRight={countBudgetInCurrentMonth(birthdays)}
         num={countBirthdaysInCurrentMonth(birthdays)}
       />
       <Buttons />
       <Birthdays currentDate={currentDate} />
       <Calendar currentDate={currentDate} setCurrentDate={setCurrentDate} />
-
-      {/* </ScrollView> */}
     </SafeAreaView>
   );
 };
